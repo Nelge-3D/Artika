@@ -122,4 +122,77 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+
+
+/*hero dinamique*/
+
 }
+@keyframes scrollUp {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+@keyframes scrollDown {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(50%); }
+}
+
+.animate-scroll-up {
+  animation: scrollUp 20s linear infinite;
+}
+
+.animate-scroll-down {
+  animation: scrollDown 20s linear infinite;
+}
+@keyframes scrollUp {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes scrollDown {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(50%);
+  }
+}
+
+.animate-gallery-up {
+  animation: scrollUp 30s linear infinite;
+}
+
+.animate-gallery-down {
+  animation: scrollDown 30s linear infinite;
+}
+
+@keyframes scrollUp {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes scrollDown {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(50%);
+  }
+}
+
+.animate-gallery-up {
+  animation: scrollUp 40s linear infinite;
+}
+
+.animate-gallery-down {
+  animation: scrollDown 40s linear infinite;
+}
+

@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Pour éviter que le tooltip se coupe à gauche */
+body {
+  overflow-x: hidden;
+}

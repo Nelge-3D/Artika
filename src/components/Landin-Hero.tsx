@@ -105,7 +105,7 @@ export default function Hero() {
         </p>
 
         <a
-          href="/dashboard"
+          href="/feed"
           className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full shadow-lg hover:from-purple-600 hover:to-pink-600 transition"
         >
           Rejoindre la communauté <ArrowRight size={18} />

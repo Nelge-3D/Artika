@@ -7,7 +7,25 @@ import { useState } from 'react'
 import ArtModal from '@/components/ui/ArtModal'
 import GalleryHeader from '@/components/ui/GalleryHeader'
 
-const artworks = [
+// Define types for artwork and artist
+interface Artwork {
+  id: string
+  image: string
+  title: string
+  artist: string
+  tools: string[]
+}
+
+interface Artist {
+  id: string
+  name: string
+  avatar: string
+  artworkCount: number
+  speciality: string
+  location: string
+}
+
+const artworks: Artwork[] = [
   { id:'1', image: '/parfum.png', title: 'Eau de parfum', artist: 'Louis-Gériel', tools: ['Canva', 'Blender'] },
   { id:'2', image: '/hero2.png', title: 'Esprit du désert', artist: 'Fatou Diop', tools: ['Photoshop', 'Blender'] },
   { id:'3', image: '/hero3.png', title: 'Fusion', artist: 'Mamadou Sagna', tools: ['Photoshop', 'Blender'] },
@@ -26,7 +44,7 @@ const artworks = [
 ]
 
 // Données des artistes (générées à partir des œuvres)
-const artists = [
+const artists: Artist[] = [
   { 
     id: '1', 
     name: 'Louis-Gériel', 
@@ -95,9 +113,9 @@ const artistsBreakpointCols = {
 export default function FeedPage() {
   const [activeTab, setActiveTab] = useState<'artists' | 'artworks'>('artworks')
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedArtwork, setSelectedArtwork] = useState<null | typeof artworks[0]>(null)
+  const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null)
 
-  const handleCardClick = (art: any) => {
+  const handleCardClick = (art: Artwork) => {
     setSelectedArtwork(art)
   }
 
@@ -105,7 +123,7 @@ export default function FeedPage() {
     setSelectedArtwork(null)
   }
 
-  const getSimilarArtworks = (artwork: any) => {
+  const getSimilarArtworks = (artwork: Artwork) => {
     return artworks.filter(a => a.artist === artwork.artist && a.id !== artwork.id)
   }
 

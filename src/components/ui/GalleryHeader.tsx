@@ -121,40 +121,46 @@ interface TabButtonProps {
   label: string
 }
 
-const TabButton = memo(({ active, onClick, label }: TabButtonProps) => (
-  <button 
-    className={`w-full sm:w-auto px-6 py-2 rounded-full text-base lg:text-lg font-medium transition-all ${
-      active 
-        ? 'bg-white text-purple-900 shadow-lg hover:shadow-xl' 
-        : 'bg-transparent text-white border border-white hover:bg-white/10'
-    }`}
-    onClick={onClick}
-    aria-pressed={active}
-  >
-    {label}
-  </button>
-))
+const TabButton = memo(function TabButton({ active, onClick, label }: TabButtonProps) {
+  return (
+    <button 
+      className={`w-full sm:w-auto px-6 py-2 rounded-full text-base lg:text-lg font-medium transition-all ${
+        active 
+          ? 'bg-white text-purple-900 shadow-lg hover:shadow-xl' 
+          : 'bg-transparent text-white border border-white hover:bg-white/10'
+      }`}
+      onClick={onClick}
+      aria-pressed={active}
+    >
+      {label}
+    </button>
+  )
+})
 
 interface CategoryButtonProps {
   category: string
 }
 
-const CategoryButton = memo(({ category }: CategoryButtonProps) => (
-  <button
-    className="snap-start px-3 sm:px-5 py-2 sm:py-3 bg-gray-100 hover:bg-gray-200 rounded-full font-medium transition-colors text-sm sm:text-base focus:ring-2 focus:ring-purple-500 focus:outline-none whitespace-nowrap"
-    aria-label={`Filtrer par ${category}`}
-  >
-    {category}
-  </button>
-))
+const CategoryButton = memo(function CategoryButton({ category }: CategoryButtonProps) {
+  return (
+    <button
+      className="snap-start px-3 sm:px-5 py-2 sm:py-3 bg-gray-100 hover:bg-gray-200 rounded-full font-medium transition-colors text-sm sm:text-base focus:ring-2 focus:ring-purple-500 focus:outline-none whitespace-nowrap"
+      aria-label={`Filtrer par ${category}`}
+    >
+      {category}
+    </button>
+  )
+})
 
-const FeaturedBadge = memo(() => (
-  <div className="text-center sm:text-left lg:text-right">
-    <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl inline-block hover:bg-white/30 transition-colors">
-      <p className="text-white font-bold text-lg lg:text-xl">En vedette</p>
-      <p className="text-white text-xs lg:text-sm">NELGE-3D</p>
+const FeaturedBadge = memo(function FeaturedBadge() {
+  return (
+    <div className="text-center sm:text-left lg:text-right">
+      <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl inline-block hover:bg-white/30 transition-colors">
+        <p className="text-white font-bold text-lg lg:text-xl">En vedette</p>
+        <p className="text-white text-xs lg:text-sm">NELGE-3D</p>
+      </div>
     </div>
-  </div>
-))
+  )
+})
 
 export default GalleryHeader

@@ -82,7 +82,7 @@ export default function LandingNavbar() {
                 href="/auth/register"
                 className="bg-purple-600 text-white px-4 py-1 rounded-full hover:bg-purple-700"
               >
-                S'inscrire
+                S&apos;inscrire
               </Link>
             </div>
           </nav>
@@ -149,7 +149,7 @@ export default function LandingNavbar() {
                     className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    S'inscrire
+                    S&apos;inscrire
                   </Link>
                 </div>
               </div>

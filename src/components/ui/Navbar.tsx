@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { Home, Upload, User, Compass, Menu, X } from 'lucide-react'
+import { Home, Upload, User, Compass,} from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import Image from 'next/image'
 
 const navItems = [
   { href: '/', icon: <Home size={20} />, label: 'Accueil' },
@@ -46,7 +47,7 @@ const Navbar = () => {
         <Link href="/" className="hover:scale-105 transition-transform duration-200">
           <div className="w-10 h-10 xl:w-12 xl:h-12 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 p-0.5 shadow-lg">
             <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
-              <img 
+              <Image
                 src="/logo.png" 
                 alt="Logo" 
                 className="w-6 h-6 xl:w-8 xl:h-8 object-contain"

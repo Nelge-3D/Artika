@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, memo } from 'react'
+import { useCallback, memo } from 'react'
 import { SearchIcon } from '@/components/icons'
 
 interface GalleryHeaderProps {
@@ -31,7 +31,7 @@ const GalleryHeader = memo(function GalleryHeader({
       <header className="relative h-auto min-h-[400px] md:h-[500px] lg:h-[600px] w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-red-800 to-purple-800 overflow-hidden">
           <div 
-            className="absolute inset-0 bg-[url('/Artika.svg')] opacity-50 bg-center bg-cover"
+            className="absolute inset-0 bg-[url('/vedette/Nelge-3D.svg')] opacity-50 bg-center bg-cover"
             aria-hidden="true"
           />
         </div>

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Metadata } from 'next'
 import Navbar from '@/components/ui/Navbar'
-import { Heart, MessageCircle, Share2, MapPin, Calendar, Eye, Users, Download, Filter, Search, Star, Camera, Palette, Code, User } from 'lucide-react'
+import { Heart, MessageCircle, Share2, MapPin, Calendar, Eye, Download, Filter, Search, Star, Camera, Palette, User } from 'lucide-react'
 
 const artworks = [
   { 
@@ -128,16 +128,25 @@ function slugify(name: string) {
     .trim()
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const artist = artworks.find(a => slugify(a.artist) === params.slug)?.artist || 'Artiste'
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}): Promise<Metadata> {
+  const { slug } = await params
+  const artist = artworks.find(a => slugify(a.artist) === slug)?.artist || 'Artiste'
   return {
     title: `${artist} - Portfolio créatif`,
     description: `Découvrez le portfolio de ${artist}, artiste visuel africain spécialisé dans l'art numérique contemporain.`
   }
 }
 
-export default function ArtistPage({ params }: { params: { slug: string } }) {
-  const slug = params.slug
+export default async function ArtistPage({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}) {
+  const { slug } = await params
   const artistArtworks = artworks.filter(art => slugify(art.artist) === slug)
 
   if (artistArtworks.length === 0) return notFound()

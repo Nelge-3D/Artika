@@ -1,18 +1,63 @@
 'use client'
 import { motion } from 'framer-motion'
-import { Lock, Mail, Eye, EyeOff } from 'lucide-react'
+import { Lock, Mail, Eye, EyeOff, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { signIn, getSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+    setError('') // Clear error when user types
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Logique de connexion
-    console.log('Email:', email, 'Password:', password)
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError('Email ou mot de passe incorrect')
+      } else {
+        // Redirect to dashboard or home page
+        router.push('/dashboard')
+      }
+    } catch (error) {
+      setError('Une erreur est survenue. Veuillez réessayer.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleOAuthSignIn = async (provider: string) => {
+    setIsLoading(true)
+    try {
+      await signIn(provider, { callbackUrl: '/dashboard' })
+    } catch (error) {
+      setError('Erreur lors de la connexion avec ' + provider)
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -57,6 +102,16 @@ export default function LoginPage() {
           className="bg-white rounded-2xl shadow-xl overflow-hidden border border-purple-100"
         >
           <div className="p-6 sm:p-8">
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm"
+              >
+                {error}
+              </motion.div>
+            )}
+
             <form onSubmit={handleSubmit}>
               <div className="mb-6">
                 <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
@@ -68,12 +123,14 @@ export default function LoginPage() {
                   </div>
                   <input
                     id="email"
+                    name="email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleChange}
                     className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="votre@email.com"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -88,17 +145,20 @@ export default function LoginPage() {
                   </div>
                   <input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleChange}
                     className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="••••••••"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    disabled={isLoading}
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
@@ -108,26 +168,34 @@ export default function LoginPage() {
                   </button>
                 </div>
                 <div className="mt-2 text-right">
-                  <Link href="/forgot-password" className="text-sm text-purple-600 hover:text-purple-800">
+                  <Link href="/auth/forgot-password" className="text-sm text-purple-600 hover:text-purple-800">
                     Mot de passe oublié ?
                   </Link>
                 </div>
               </div>
 
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                whileTap={{ scale: isLoading ? 1 : 0.98 }}
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                Se connecter
+                {isLoading ? (
+                  <>
+                    <Loader className="w-5 h-5 mr-2 animate-spin" />
+                    Connexion...
+                  </>
+                ) : (
+                  'Se connecter'
+                )}
               </motion.button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-gray-600 text-sm">
                 Vous n&apos;avez pas de compte ?{' '}
-                <Link href="/register" className="text-purple-600 font-semibold hover:text-purple-800">
+                <Link href="/auth/register" className="text-purple-600 font-semibold hover:text-purple-800">
                   Créer un compte
                 </Link>
               </p>
@@ -142,9 +210,11 @@ export default function LoginPage() {
 
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center py-2.5 px-4 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                  whileHover={{ scale: isLoading ? 1 : 1.05 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.95 }}
+                  onClick={() => handleOAuthSignIn('google')}
+                  disabled={isLoading}
+                  className="flex items-center justify-center py-2.5 px-4 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                     <path
@@ -167,9 +237,11 @@ export default function LoginPage() {
                   Google
                 </motion.button>
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center py-2.5 px-4 bg-[#1877F2] text-white rounded-xl hover:bg-[#166FE5] transition-colors"
+                  whileHover={{ scale: isLoading ? 1 : 1.05 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.95 }}
+                  onClick={() => handleOAuthSignIn('facebook')}
+                  disabled={isLoading}
+                  className="flex items-center justify-center py-2.5 px-4 bg-[#1877F2] text-white rounded-xl hover:bg-[#166FE5] transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />

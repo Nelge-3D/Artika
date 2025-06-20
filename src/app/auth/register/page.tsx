@@ -1,8 +1,10 @@
 'use client'
 import { motion } from 'framer-motion'
-import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { User, Mail, Lock, Eye, EyeOff, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -13,6 +15,10 @@ export default function RegisterPage() {
     password: '',
     terms: false
   })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -20,12 +26,78 @@ export default function RegisterPage() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }))
+    setError('')
+    setSuccess('')
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Logique d'inscription
-    console.log('Form data:', formData)
+    setIsLoading(true)
+    setError('')
+    setSuccess('')
+
+    // Validation côté client
+    if (formData.password.length < 8) {
+      setError('Le mot de passe doit contenir au moins 8 caractères')
+      setIsLoading(false)
+      return
+    }
+
+    if (!formData.terms) {
+      setError('Vous devez accepter les conditions d\'utilisation')
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setSuccess('Compte créé avec succès ! Connexion en cours...')
+        
+        // Connexion automatique après inscription
+        const result = await signIn('credentials', {
+          email: formData.email,
+          password: formData.password,
+          redirect: false,
+        })
+
+        if (result?.error) {
+          setError('Compte créé mais erreur de connexion. Veuillez vous connecter manuellement.')
+        } else {
+          router.push('/dashboard')
+        }
+      } else {
+        setError(data.error || 'Une erreur est survenue lors de l\'inscription')
+      }
+    } catch (error) {
+      setError('Une erreur est survenue. Veuillez réessayer.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleOAuthSignIn = async (provider: string) => {
+    setIsLoading(true)
+    try {
+      await signIn(provider, { callbackUrl: '/dashboard' })
+    } catch (error) {
+      setError('Erreur lors de l\'inscription avec ' + provider)
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -70,6 +142,26 @@ export default function RegisterPage() {
           className="bg-white rounded-2xl shadow-xl overflow-hidden border border-purple-100"
         >
           <div className="p-6 sm:p-8">
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm"
+              >
+                {error}
+              </motion.div>
+            )}
+
+            {success && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-600 text-sm"
+              >
+                {success}
+              </motion.div>
+            )}
+
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
@@ -89,6 +181,7 @@ export default function RegisterPage() {
                       className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="Votre prénom"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -109,6 +202,7 @@ export default function RegisterPage() {
                       className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="Votre nom"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -131,6 +225,7 @@ export default function RegisterPage() {
                     className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="votre@email.com"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -152,11 +247,13 @@ export default function RegisterPage() {
                     className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="••••••••"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    disabled={isLoading}
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
@@ -180,6 +277,7 @@ export default function RegisterPage() {
                     onChange={handleChange}
                     className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                     required
+                    disabled={isLoading}
                   />
                   <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
                     J&apos;accepte les{' '}
@@ -195,12 +293,20 @@ export default function RegisterPage() {
               </div>
 
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                whileTap={{ scale: isLoading ? 1 : 0.98 }}
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                Créer mon compte
+                {isLoading ? (
+                  <>
+                    <Loader className="w-5 h-5 mr-2 animate-spin" />
+                    Création en cours...
+                  </>
+                ) : (
+                  'Créer mon compte'
+                )}
               </motion.button>
             </form>
 
@@ -222,9 +328,11 @@ export default function RegisterPage() {
 
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center py-2.5 px-4 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                  whileHover={{ scale: isLoading ? 1 : 1.05 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.95 }}
+                  onClick={() => handleOAuthSignIn('google')}
+                  disabled={isLoading}
+                  className="flex items-center justify-center py-2.5 px-4 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                     <path
@@ -247,9 +355,11 @@ export default function RegisterPage() {
                   Google
                 </motion.button>
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center py-2.5 px-4 bg-[#1877F2] text-white rounded-xl hover:bg-[#166FE5] transition-colors"
+                  whileHover={{ scale: isLoading ? 1 : 1.05 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.95 }}
+                  onClick={() => handleOAuthSignIn('facebook')}
+                  disabled={isLoading}
+                  className="flex items-center justify-center py-2.5 px-4 bg-[#1877F2] text-white rounded-xl hover:bg-[#166FE5] transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />

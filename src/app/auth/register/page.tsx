@@ -73,7 +73,9 @@ export default function RegisterPage() {
           email: formData.email,
           password: formData.password,
           redirect: false,
-        })
+        }
+        
+      )
 
         if (result?.error) {
           setError('Compte créé mais erreur de connexion. Veuillez vous connecter manuellement.')

@@ -50,6 +50,8 @@ const Navbar = () => {
               <Image
                 src="/logo.png" 
                 alt="Logo" 
+                width={32}
+                height={32}
                 className="w-6 h-6 xl:w-8 xl:h-8 object-contain"
               />
             </div>

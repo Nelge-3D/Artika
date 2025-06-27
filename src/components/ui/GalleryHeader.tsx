@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, memo } from 'react'
+import { useCallback, memo, useState } from 'react'
 import { SearchIcon } from '@/components/icons'
 
 interface GalleryHeaderProps {
@@ -12,12 +12,44 @@ interface GalleryHeaderProps {
 
 const CATEGORIES = ["Photographie", "3D", "2D", "Infographie", "Sculpture"] as const
 
+// Configuration des artistes en vedette
+const FEATURED_ARTISTS: FeaturedArtist[] = [
+  {
+    id: 'nelge-3d',
+    name: 'NELGE-3D',
+    displayName: 'NELGE-3D',
+    backgroundImage: '/vedette/Nelge-3D.svg'
+  },
+  {
+    id: 'marie-dance',
+    name: 'MARie',
+    displayName: 'Marie',
+    backgroundImage: '/vedette/artika.svg'
+  },
+  {
+    id: 'kev-digital',
+    name: 'Kev Graphix', 
+    displayName: 'Kev Graphix',
+    backgroundImage: '/vedette/kev.svg'
+  },
+  {
+    id: 'sophie-sculpt',
+    name: 'Neyc Photography',
+    displayName: 'Neyc', 
+    backgroundImage: '/vedette/neyc.svg'
+  }
+]
+
 const GalleryHeader = memo(function GalleryHeader({ 
   activeTab, 
   setActiveTab, 
   searchQuery, 
   setSearchQuery 
 }: GalleryHeaderProps) {
+  // État pour l'artiste en vedette actuel
+  const [featuredArtistIndex, setFeaturedArtistIndex] = useState(0)
+  const currentArtist = FEATURED_ARTISTS[featuredArtistIndex]
+
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }, [setSearchQuery])
@@ -26,12 +58,18 @@ const GalleryHeader = memo(function GalleryHeader({
     setActiveTab(tab)
   }, [setActiveTab])
 
+  // Fonction pour changer d'artiste en vedette
+  const handleFeaturedArtistChange = useCallback(() => {
+    setFeaturedArtistIndex((prev) => (prev + 1) % FEATURED_ARTISTS.length)
+  }, [])
+
   return (
     <>
       <header className="relative h-auto min-h-[400px] md:h-[500px] lg:h-[600px] w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-red-800 to-purple-800 overflow-hidden">
           <div 
-            className="absolute inset-0 bg-[url('/vedette/Nelge-3D.svg')] opacity-50 bg-center bg-cover"
+            className="absolute inset-0 opacity-50 bg-center bg-cover transition-all duration-700 ease-in-out"
+            style={{ backgroundImage: `url('${currentArtist.backgroundImage}')` }}
             aria-hidden="true"
           />
         </div>
@@ -93,7 +131,12 @@ const GalleryHeader = memo(function GalleryHeader({
               </div>
             </div>
 
-            <FeaturedBadge />
+            <FeaturedBadge 
+              artist={currentArtist}
+              onArtistChange={handleFeaturedArtistChange}
+              currentIndex={featuredArtistIndex}
+              totalArtists={FEATURED_ARTISTS.length}
+            />
           </div>
         </div>
       </header>
@@ -152,12 +195,50 @@ const CategoryButton = memo(function CategoryButton({ category }: CategoryButton
   )
 })
 
-const FeaturedBadge = memo(function FeaturedBadge() {
+// Type pour un artiste en vedette
+type FeaturedArtist = {
+  id: string
+  name: string
+  displayName: string
+  backgroundImage: string
+}
+
+interface FeaturedBadgeProps {
+  artist: FeaturedArtist
+  onArtistChange: () => void
+  currentIndex: number
+  totalArtists: number
+}
+
+const FeaturedBadge = memo(function FeaturedBadge({ 
+  artist, 
+  onArtistChange, 
+  currentIndex, 
+  totalArtists 
+}: FeaturedBadgeProps) {
   return (
     <div className="text-center sm:text-left lg:text-right">
       <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl inline-block hover:bg-white/30 transition-colors">
-        <p className="text-white font-bold text-lg lg:text-xl">En vedette</p>
-        <p className="text-white text-xs lg:text-sm">NELGE-3D</p>
+        <div className="flex items-center justify-between gap-3 mb-2">
+          <p className="text-white font-bold text-lg lg:text-xl">En vedette</p>
+          <button
+            onClick={onArtistChange}
+            className="text-white hover:text-gray-200 transition-colors text-xs bg-white/20 px-2 py-1 rounded-full"
+            aria-label="Changer d'artiste en vedette"
+          >
+            {currentIndex + 1}/{totalArtists}
+          </button>
+        </div>
+        <p className="text-white text-xs lg:text-sm font-medium mb-2">
+          {artist.displayName}
+        </p>
+        <button
+          onClick={onArtistChange}
+          className="text-white/80 hover:text-white text-xs transition-colors underline"
+          aria-label={`Passer à l'artiste suivant`}
+        >
+          Suivant →
+        </button>
       </div>
     </div>
   )

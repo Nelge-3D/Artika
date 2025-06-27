@@ -24,19 +24,19 @@ const FEATURED_ARTISTS: FeaturedArtist[] = [
     id: 'marie-dance',
     name: 'MARie',
     displayName: 'Marie',
-    backgroundImage: '/vedette/artika.svg'
+    backgroundImage: '/vedette/Artika.svg'
   },
   {
     id: 'kev-digital',
     name: 'Kev Graphix', 
     displayName: 'Kev Graphix',
-    backgroundImage: '/vedette/kev.svg'
+    backgroundImage: '/vedette/Kev.svg'
   },
   {
     id: 'sophie-sculpt',
     name: 'Neyc Photography',
     displayName: 'Neyc', 
-    backgroundImage: '/vedette/neyc.svg'
+    backgroundImage: '/vedette/Neyc.svg'
   }
 ]
 

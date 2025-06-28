@@ -8,6 +8,8 @@ interface GalleryHeaderProps {
   setActiveTab: (tab: 'artists' | 'artworks') => void
   searchQuery: string
   setSearchQuery: (query: string) => void
+  activeCategory: string | null
+  setActiveCategory: (category: string | null) => void
 }
 
 const CATEGORIES = ["Photographie", "3D", "2D", "Infographie", "Sculpture"] as const
@@ -24,19 +26,19 @@ const FEATURED_ARTISTS: FeaturedArtist[] = [
     id: 'marie-dance',
     name: 'MARie',
     displayName: 'Marie',
-    backgroundImage: '/vedette/artika.svg'
+    backgroundImage: '/vedette/Artika.svg'
   },
   {
     id: 'kev-digital',
     name: 'Kev Graphix', 
     displayName: 'Kev Graphix',
-    backgroundImage: '/vedette/kev.svg'
+    backgroundImage: '/vedette/Kev.svg'
   },
   {
     id: 'sophie-sculpt',
     name: 'Neyc Photography',
     displayName: 'Neyc', 
-    backgroundImage: '/vedette/neyc.svg'
+    backgroundImage: '/vedette/Neyc.svg'
   }
 ]
 
@@ -44,7 +46,9 @@ const GalleryHeader = memo(function GalleryHeader({
   activeTab, 
   setActiveTab, 
   searchQuery, 
-  setSearchQuery 
+  setSearchQuery,
+  activeCategory,
+  setActiveCategory
 }: GalleryHeaderProps) {
   // État pour l'artiste en vedette actuel
   const [featuredArtistIndex, setFeaturedArtistIndex] = useState(0)
@@ -142,11 +146,31 @@ const GalleryHeader = memo(function GalleryHeader({
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 -mt-8 sm:-mt-10 z-10 relative">
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+        <div className="bg-white rounded-xl shadow-lg p-2 sm:p-3">
           <nav aria-label="Filtres de catégories">
             <div className="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar snap-x justify-start sm:justify-start">
+              <button
+                className={`snap-start px-3 sm:px-5 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-base focus:ring-2 focus:ring-purple-500 focus:outline-none whitespace-nowrap ${
+                  activeCategory === null 
+                    ? 'bg-purple-500 text-white' 
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+                onClick={() => setActiveCategory(null)}
+              >
+                Toutes
+              </button>
               {CATEGORIES.map((cat) => (
-                <CategoryButton key={cat} category={cat} />
+                <button
+                  key={cat}
+                  className={`snap-start px-3 sm:px-5 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-base focus:ring-2 focus:ring-purple-500 focus:outline-none whitespace-nowrap ${
+                    cat === activeCategory 
+                      ? 'bg-purple-500 text-white' 
+                      : 'bg-gray-100 hover:bg-gray-200'
+                  }`}
+                  onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
+                >
+                  {cat}
+                </button>
               ))}
             </div>
           </nav>
@@ -176,21 +200,6 @@ const TabButton = memo(function TabButton({ active, onClick, label }: TabButtonP
       aria-pressed={active}
     >
       {label}
-    </button>
-  )
-})
-
-interface CategoryButtonProps {
-  category: string
-}
-
-const CategoryButton = memo(function CategoryButton({ category }: CategoryButtonProps) {
-  return (
-    <button
-      className="snap-start px-3 sm:px-5 py-2 sm:py-3 bg-gray-100 hover:bg-gray-200 rounded-full font-medium transition-colors text-sm sm:text-base focus:ring-2 focus:ring-purple-500 focus:outline-none whitespace-nowrap"
-      aria-label={`Filtrer par ${category}`}
-    >
-      {category}
     </button>
   )
 })

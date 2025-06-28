@@ -71,7 +71,7 @@ export default function ArtCard({ image, title, artist, onClick }: ArtCardProps)
               #art
             </span>
             <span className="px-3 py-1 text-xs font-medium bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
-              #african
+              #3D
             </span>
           </div>
 

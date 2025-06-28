@@ -7,6 +7,8 @@ import { useState } from 'react'
 import ArtModal from '@/components/ui/ArtModal'
 import GalleryHeader from '@/components/ui/GalleryHeader'
 
+
+
 // Define types for artwork and artist
 interface Artwork {
   id: string
@@ -14,6 +16,7 @@ interface Artwork {
   title: string
   artist: string
   tools: string[]
+  category: string
 }
 
 interface Artist {
@@ -25,22 +28,23 @@ interface Artist {
   location: string
 }
 
+// Mettez à jour vos données d'œuvres avec les catégories
 const artworks: Artwork[] = [
-  { id:'1', image: '/parfum.png', title: 'Eau de parfum', artist: 'Louis-Gériel', tools: ['Canva', 'Blender'] },
-  { id:'2', image: '/hero2.png', title: 'Esprit du désert', artist: 'Fatou Diop', tools: ['Photoshop', 'Blender'] },
-  { id:'3', image: '/hero3.png', title: 'Fusion', artist: 'Mamadou Sagna', tools: ['Photoshop', 'Blender'] },
-  { id:'4', image: '/hero4.png', title: 'Identité', artist: 'Ayo Kale', tools: ['Photoshop', 'Blender'] },
-  { id:'5', image: '/hero5.png', title: 'Dakar Dreams', artist: 'Binta Kane', tools: ['Photoshop', 'Blender'] },
-  { id:'6', image: '/hero1.png', title: 'Beauté Noire', artist: 'Kofi Mensah', tools: ['Photoshop', 'Blender'] },
-  { id:'7', image: '/hero2.png', title: 'Esprit du désert', artist: 'Fatou Diop', tools: ['Photoshop', 'Blender'] },
-  { id:'8', image: '/hero3.png', title: 'Fusion', artist: 'Mamadou Sagna', tools: ['Photoshop', 'Blender'] },
-  { id:'9', image: '/hero4.png', title: 'Identité', artist: 'Ayo Kale' , tools: ['Photoshop', 'Blender']},
-  { id:'10', image: '/hero5.png', title: 'Dakar Dreams', artist: 'Binta Kane', tools: ['Photoshop', 'Blender'] },
-  { id:'11', image: '/hero1.png', title: 'Beauté Noire', artist: 'Kofi Mensah', tools: ['Photoshop', 'Blender'] },
-  { id:'12', image: '/hero2.png', title: 'Esprit du désert', artist: 'Fatou Diop', tools: ['Photoshop', 'Blender'] },
-  { id:'13', image: '/hero3.png', title: 'Fusion', artist: 'Mamadou Sagna' , tools: ['Photoshop', 'Blender']},
-  { id:'14', image: '/hero4.png', title: 'Identité', artist: 'Ayo Kale' , tools: ['Photoshop', 'Blender']},
-  { id:'15', image: '/hero5.png', title: 'Dakar Dreams', artist: 'Binta Kane' , tools: ['Photoshop', 'Blender']},
+  { id:'1', image: '/parfum.png', title: 'Eau de parfum', artist: 'Louis-Gériel', tools: ['Canva', 'Blender'], category: '3D' },
+  { id:'2', image: '/hero2.png', title: 'Esprit du désert', artist: 'Fatou Diop', tools: ['Photoshop', 'Blender'], category: 'Photographie' },
+  { id:'3', image: '/hero3.png', title: 'Fusion', artist: 'Mamadou Sagna', tools: ['Photoshop', 'Blender'], category: '3D' },
+  { id:'4', image: '/hero4.png', title: 'Identité', artist: 'Ayo Kale', tools: ['Photoshop', 'Blender'], category: '2D' },
+  { id:'5', image: '/hero5.png', title: 'Dakar Dreams', artist: 'Binta Kane', tools: ['Photoshop', 'Blender'], category: 'Infographie' },
+  { id:'6', image: '/hero1.png', title: 'Beauté Noire', artist: 'Kofi Mensah', tools: ['Photoshop', 'Blender'], category: 'Photographie' },
+  { id:'7', image: '/hero2.png', title: 'Esprit du désert', artist: 'Fatou Diop', tools: ['Photoshop', 'Blender'], category: 'Photographie' },
+  { id:'8', image: '/hero3.png', title: 'Fusion', artist: 'Mamadou Sagna', tools: ['Photoshop', 'Blender'], category: '3D' },
+  { id:'9', image: '/hero4.png', title: 'Identité', artist: 'Ayo Kale' , tools: ['Photoshop', 'Blender'], category: '2D' },
+  { id:'10', image: '/hero5.png', title: 'Dakar Dreams', artist: 'Binta Kane', tools: ['Photoshop', 'Blender'], category: 'Infographie' },
+  { id:'11', image: '/hero1.png', title: 'Beauté Noire', artist: 'Kofi Mensah', tools: ['Photoshop', 'Blender'], category: 'Photographie' },
+  { id:'12', image: '/hero2.png', title: 'Esprit du désert', artist: 'Fatou Diop', tools: ['Photoshop', 'Blender'], category: 'Photographie' },
+  { id:'13', image: '/hero3.png', title: 'Fusion', artist: 'Mamadou Sagna' , tools: ['Photoshop', 'Blender'], category: '3D' },
+  { id:'14', image: '/hero4.png', title: 'Identité', artist: 'Ayo Kale' , tools: ['Photoshop', 'Blender'], category: '2D' },
+  { id:'15', image: '/hero5.png', title: 'Dakar Dreams', artist: 'Binta Kane' , tools: ['Photoshop', 'Blender'], category: 'Sculpture' },
 ]
 
 // Données des artistes (générées à partir des œuvres)
@@ -48,15 +52,15 @@ const artists: Artist[] = [
   { 
     id: '1', 
     name: 'Louis-Gériel', 
-    avatar: '/parfum.png', 
+    avatar: '/vedette/Nelge-3D.svg', 
     artworkCount: artworks.filter(art => art.artist === 'Louis-Gériel').length,
     speciality: 'Design graphique',
-    location: 'Dakar, Sénégal'
+    location: 'Owendo,Gabon'
   },
   { 
     id: '2', 
     name: 'Fatou Diop', 
-    avatar: '/hero2.png', 
+    avatar: '/vedette/Artika.svg', 
     artworkCount: artworks.filter(art => art.artist === 'Fatou Diop').length,
     speciality: 'Art digital',
     location: 'Saint-Louis, Sénégal'
@@ -64,18 +68,18 @@ const artists: Artist[] = [
   { 
     id: '3', 
     name: 'Mamadou Sagna', 
-    avatar: '/hero3.png', 
+    avatar: '/vedette/Kev.svg', 
     artworkCount: artworks.filter(art => art.artist === 'Mamadou Sagna').length,
     speciality: 'Infographie 3D',
-    location: 'Thiès, Sénégal'
+    location: 'Owendo, Gabon'
   },
   { 
     id: '4', 
     name: 'Ayo Kale', 
-    avatar: '/hero4.png', 
+    avatar: '/vedette/Neyc.svg', 
     artworkCount: artworks.filter(art => art.artist === 'Ayo Kale').length,
     speciality: 'Photomontage',
-    location: 'Lagos, Nigeria'
+    location: 'France, Paris'
   },
   { 
     id: '5', 
@@ -110,10 +114,12 @@ const artistsBreakpointCols = {
   640: 1,          // 1 colonne sur mobile
 }
 
+// Dans le composant FeedPage, ajoutez l'état pour la catégorie active
 export default function FeedPage() {
   const [activeTab, setActiveTab] = useState<'artists' | 'artworks'>('artworks')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null)
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
 
   const handleCardClick = (art: Artwork) => {
     setSelectedArtwork(art)
@@ -127,10 +133,11 @@ export default function FeedPage() {
     return artworks.filter(a => a.artist === artwork.artist && a.id !== artwork.id)
   }
 
-  // Filtrer les œuvres selon la recherche
+  // Modifiez le filtrage des œuvres pour inclure la catégorie
   const filteredArtworks = artworks.filter(art => 
-    art.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    art.artist.toLowerCase().includes(searchQuery.toLowerCase())
+    (art.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     art.artist.toLowerCase().includes(searchQuery.toLowerCase())) &&
+    (activeCategory ? art.category === activeCategory : true)
   )
 
   // Filtrer les artistes selon la recherche
@@ -147,6 +154,8 @@ export default function FeedPage() {
         setActiveTab={setActiveTab}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        activeCategory={activeCategory}
+        setActiveCategory={setActiveCategory}
       />
 
       {/* Contenu conditionnel selon l'onglet actif */}

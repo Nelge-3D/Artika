@@ -53,12 +53,12 @@ export default function AboutSection() {
           className="max-w-5xl mx-auto text-center mb-16"
         >
           <h2 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-gray-800 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6 leading-tight">
-            Donner une voix à l&apos;art africain
+            Donner une voix à l&apos;art digital
           </h2>
           <p className="text-xl md:text-2xl text-gray-700 mb-8 leading-relaxed max-w-4xl mx-auto">
-            <strong className="text-purple-600">ArTika</strong> est la première plateforme dédiée aux artistes visuels gabonais et africains. 
+            <strong className="text-purple-600">ArTika</strong> est la première plateforme dédiée aux artistes visuels gabonais. 
             Notre mission : <span className="font-semibold text-indigo-600">briser les barrières</span>, célébrer la créativité 
-            et connecter les talents du continent avec le monde entier.
+            et créer un communauté engagée.
           </p>
           
           {/* Points clés */}

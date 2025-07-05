@@ -108,7 +108,7 @@ export default function Hero() {
         </motion.h1>
 
         <p className="text-base md:text-lg text-white mb-8">
-          Découvrez les talents visuels du continent avec <span className="text-blue-600 font-semibold">Artika</span>.
+          Découvrez les talents visuels avec <span className="text-blue-600 font-semibold">ArTika</span>.
         </p>
       </motion.div>
 

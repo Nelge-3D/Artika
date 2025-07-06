@@ -6,116 +6,7 @@ import Link from 'next/link'
 import { Metadata } from 'next'
 import Navbar from '@/components/ui/Navbar'
 import { Heart, MessageCircle, Share2, MapPin, Calendar, Eye, Download, Filter, Search, Star, Camera, Palette, User } from 'lucide-react'
-
-const artworks = [
-  { 
-    id: '1', 
-    image: '/parfum.png', 
-    title: 'Eau de parfum', 
-    artist: 'Louis-Gériel', 
-    tools: ['Canva', 'Blender'], 
-    popularity: 77,
-    category: 'Branding',
-    year: 2024,
-    likes: 156,
-    views: 2340,
-    description: 'Création d\'une identité visuelle moderne pour une marque de parfum haut de gamme.',
-    images: ['/parfum.png', '/parfum-2.png', '/parfum-3.png']
-  },
-  { 
-    id: '2', 
-    image: '/hero2.png', 
-    title: 'Esprit du désert', 
-    artist: 'Fatou Diop', 
-    tools: ['Procreate', 'Lightroom'], 
-    popularity: 77,
-    category: 'Illustration',
-    year: 2024,
-    likes: 203,
-    views: 3200,
-    description: 'Série d\'illustrations inspirées des paysages du Sahel.',
-    images: ['/hero2.png']
-  },
-  { 
-    id: '3', 
-    image: '/hero3.png', 
-    title: 'Fusion', 
-    artist: 'Mamadou Sagna', 
-    tools: ['Illustrator'], 
-    popularity: 85,
-    category: 'Graphisme',
-    year: 2023,
-    likes: 312,
-    views: 4560,
-    description: 'Exploration des formes géométriques africaines contemporaines.',
-    images: ['/hero3.png']
-  },
-  { 
-    id: '4', 
-    image: '/hero4.png', 
-    title: 'Identité', 
-    artist: 'Ayo Kale', 
-    tools: ['Figma'], 
-    popularity: 64,
-    category: 'UI/UX',
-    year: 2024,
-    likes: 89,
-    views: 1870,
-    description: 'Interface utilisateur pour une application de découverte culturelle.',
-    images: ['/hero4.png']
-  },
-  { 
-    id: '5', 
-    image: '/hero5.png', 
-    title: 'Dakar Dreams', 
-    artist: 'Binta Kane', 
-    tools: ['Blender'], 
-    popularity: 93,
-    category: '3D',
-    year: 2024,
-    likes: 445,
-    views: 6780,
-    description: 'Visualisation 3D futuriste de la capitale sénégalaise.',
-    images: ['/hero5.png']
-  },
-]
-
-const artistsData = {
-  'louis-geriel': {
-    name: 'Louis-Gériel',
-    bio: 'Designer graphique passionné par l\'intersection entre tradition africaine et modernité numérique. Spécialisé dans l\'identité visuelle et le branding culturel.',
-    location: 'Dakar, Sénégal',
-    joinDate: 'Janvier 2023',
-    followers: 1247,
-    following: 342,
-    totalViews: 12450,
-    totalLikes: 890,
-    available: true,
-    skills: ['Branding', 'Identité visuelle', 'Packaging', 'Direction artistique'],
-    experience: '5+ ans d\'expérience',
-    education: 'École Supérieure d\'Art de Dakar',
-    website: 'louisgeriel.com',
-    instagram: '@louisgeriel_design',
-    behance: 'louisgeriel'
-  },
-  'fatou-diop': {
-    name: 'Fatou Diop',
-    bio: 'Illustratrice et artiste numérique explorant les récits africains contemporains à travers des œuvres vibrantes et expressives.',
-    location: 'Abidjan, Côte d\'Ivoire',
-    joinDate: 'Mars 2022',
-    followers: 2156,
-    following: 178,
-    totalViews: 18900,
-    totalLikes: 1456,
-    available: true,
-    skills: ['Illustration', 'Art numérique', 'Storytelling', 'Character design'],
-    experience: '7+ ans d\'expérience',
-    education: 'Beaux-Arts de Abidjan',
-    website: 'fatoudiop.art',
-    instagram: '@fatou_illustrations',
-    behance: 'fatoudiop'
-  }
-}
+import { getArtworks, getArtistBySlug, getArtworksByArtist } from '@/app/data/artistsdataservices'
 
 function slugify(name: string) {
   return name
@@ -134,6 +25,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }> 
 }): Promise<Metadata> {
   const { slug } = await params
+  const artworks = getArtworks()
   const artist = artworks.find(a => slugify(a.artist) === slug)?.artist || 'Artiste'
   return {
     title: `${artist} - Portfolio créatif`,
@@ -147,12 +39,18 @@ export default async function ArtistPage({
   params: Promise<{ slug: string }> 
 }) {
   const { slug } = await params
-  const artistArtworks = artworks.filter(art => slugify(art.artist) === slug)
+  
+  // Récupération des données via les services
+  const artistArtworks = getArtworksByArtist(slug)
+  const artistData = getArtistBySlug(slug)
+  const allArtworks = getArtworks()
 
   if (artistArtworks.length === 0) return notFound()
 
   const artistName = artistArtworks[0].artist
-  const artistData = artistsData[slug as keyof typeof artistsData] || {
+  
+  // Données par défaut si l'artiste n'est pas trouvé dans la base
+  const defaultArtistData = {
     name: artistName,
     bio: `${artistName} est un artiste visuel basé en Afrique de l'Ouest, explorant les liens entre tradition et modernité.`,
     location: 'Afrique de l\'Ouest',
@@ -169,6 +67,8 @@ export default async function ArtistPage({
     instagram: '',
     behance: ''
   }
+
+  const finalArtistData = artistData || defaultArtistData
   
   const artistIcon = `/avatars/${slug}.png`
   const popularity = Math.round(
@@ -203,15 +103,15 @@ export default async function ArtistPage({
                 </div>
                 
                 <div className="text-center sm:text-left">
-                  <h1 className="text-4xl lg:text-5xl font-bold text-white mb-2">{artistData.name}</h1>
+                  <h1 className="text-4xl lg:text-5xl font-bold text-white mb-2">{finalArtistData.name}</h1>
                   <div className="flex flex-wrap items-center gap-4 text-white/90 mb-4">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
-                      <span>{artistData.location}</span>
+                      <span>{finalArtistData.location}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      <span>Membre depuis {artistData.joinDate}</span>
+                      <span>Membre depuis {finalArtistData.joinDate}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -226,7 +126,7 @@ export default async function ArtistPage({
                       <div className="text-sm">Projets</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold">{artistData.followers.toLocaleString()}</div>
+                      <div className="text-2xl font-bold">{finalArtistData.followers.toLocaleString()}</div>
                       <div className="text-sm">Abonnés</div>
                     </div>
                     <div className="text-center">
@@ -241,9 +141,9 @@ export default async function ArtistPage({
 
                   {/* Statut disponibilité */}
                   <div className="flex items-center gap-2 mb-4">
-                    <div className={`w-3 h-3 rounded-full ${artistData.available ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                    <div className={`w-3 h-3 rounded-full ${finalArtistData.available ? 'bg-green-400' : 'bg-red-400'}`}></div>
                     <span className="text-white/90 text-sm">
-                      {artistData.available ? 'Disponible pour de nouveaux projets' : 'Occupé actuellement'}
+                      {finalArtistData.available ? 'Disponible pour de nouveaux projets' : 'Occupé actuellement'}
                     </span>
                   </div>
                 </div>
@@ -384,16 +284,16 @@ export default async function ArtistPage({
             {/* À propos */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold mb-4 text-gray-900">À propos</h3>
-              <p className="text-gray-700 leading-relaxed mb-4">{artistData.bio}</p>
+              <p className="text-gray-700 leading-relaxed mb-4">{finalArtistData.bio}</p>
               
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">{artistData.experience}</span>
+                  <span className="text-gray-600">{finalArtistData.experience}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">{artistData.education}</span>
+                  <span className="text-gray-600">{finalArtistData.education}</span>
                 </div>
               </div>
             </div>
@@ -402,7 +302,7 @@ export default async function ArtistPage({
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold mb-4 text-gray-900">Compétences</h3>
               <div className="flex flex-wrap gap-2">
-                {artistData.skills.map((skill, index) => (
+                {finalArtistData.skills.map((skill, index) => (
                   <span
                     key={index}
                     className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium"
@@ -417,20 +317,20 @@ export default async function ArtistPage({
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold mb-4 text-gray-900">Liens</h3>
               <div className="space-y-3">
-                {artistData.website && (
-                  <a href={`https://${artistData.website}`} className="flex items-center gap-2 text-purple-600 hover:text-purple-700 transition">
+                {finalArtistData.website && (
+                  <a href={`https://${finalArtistData.website}`} className="flex items-center gap-2 text-purple-600 hover:text-purple-700 transition">
                     <div className="w-4 h-4 bg-purple-100 rounded"></div>
-                    <span className="text-sm">{artistData.website}</span>
+                    <span className="text-sm">{finalArtistData.website}</span>
                   </a>
                 )}
-                {artistData.instagram && (
-                  <a href={`https://instagram.com/${artistData.instagram.replace('@', '')}`} className="flex items-center gap-2 text-pink-600 hover:text-pink-700 transition">
+                {finalArtistData.instagram && (
+                  <a href={`https://instagram.com/${finalArtistData.instagram.replace('@', '')}`} className="flex items-center gap-2 text-pink-600 hover:text-pink-700 transition">
                     <Camera className="w-4 h-4" />
-                    <span className="text-sm">{artistData.instagram}</span>
+                    <span className="text-sm">{finalArtistData.instagram}</span>
                   </a>
                 )}
-                {artistData.behance && (
-                  <a href={`https://behance.net/${artistData.behance}`} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition">
+                {finalArtistData.behance && (
+                  <a href={`https://behance.net/${finalArtistData.behance}`} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition">
                     <Palette className="w-4 h-4" />
                     <span className="text-sm">Behance</span>
                   </a>
@@ -442,7 +342,7 @@ export default async function ArtistPage({
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold mb-4 text-gray-900">Artistes similaires</h3>
               <div className="space-y-3">
-                {artworks.filter(art => art.artist !== artistName).slice(0, 3).map((art) => (
+                {allArtworks.filter(art => art.artist !== artistName).slice(0, 3).map((art) => (
                   <Link 
                     key={art.id}
                     href={`/artist/${slugify(art.artist)}`}

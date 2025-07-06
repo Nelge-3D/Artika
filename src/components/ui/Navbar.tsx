@@ -16,14 +16,14 @@ const Navbar = () => {
 
   // Navigation items pour utilisateurs non connectés
   const guestNavItems = [
-    { href: '/', icon: <Home size={20} />, label: 'Accueil' },
+    { href: '/feed', icon: <Home size={20} />, label: 'Home' },
     { href: '/explore', icon: <Compass size={20} />, label: 'Explorer' },
     { href: '/auth/login', icon: <User size={20} />, label: 'Se connecter' },
   ]
 
   // Navigation items pour utilisateurs connectés
   const userNavItems = [
-    { href: '/dashboard', icon: <Home size={20} />, label: 'Dashboard' },
+    { href: '/', icon: <Home size={20} />, label: 'Home' },
     { href: '/feed', icon: <Compass size={20} />, label: 'Feed' },
     { href: '/upload', icon: <Upload size={20} />, label: 'Publier' },
     { href: '/explore', icon: <Compass size={20} />, label: 'Explorer' },
@@ -120,45 +120,59 @@ const Navbar = () => {
 
         {/* User Menu Desktop */}
         {session && (
-          <div className="mt-auto relative">
+          <div className="mt-auto flex flex-col gap-4">
+            {/* Bouton de déconnexion direct - Option 1 */}
             <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowUserMenu(!showUserMenu)
-              }}
-              className="group relative flex justify-center items-center p-3 rounded-lg transition-all duration-200 text-gray-600 hover:text-blue-600 hover:bg-gray-50"
+              onClick={handleSignOut}
+              className="group relative flex justify-center items-center p-3 rounded-lg transition-all duration-200 text-gray-600 hover:text-red-600 hover:bg-red-50"
+              title="Se déconnecter"
             >
-              <div className="w-6 h-6 xl:w-8 xl:h-8 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xs xl:text-sm font-medium">
-                {getUserInitials()}
-              </div>
+              <LogOut size={20} />
               <span className="absolute left-16 xl:left-20 z-10 scale-0 rounded-lg bg-gray-900 px-3 py-2 text-sm text-white transition-all group-hover:scale-100 whitespace-nowrap shadow-lg">
-                {getUserDisplayName()}
+                Se déconnecter
               </span>
             </button>
 
-            {/* Dropdown Menu Desktop */}
-            {showUserMenu && (
-              <div className="absolute left-16 xl:left-20 bottom-0 w-48 bg-white rounded-lg shadow-lg border py-2 z-50">
-                <div className="px-4 py-2 border-b">
-                  <p className="font-medium text-gray-900 text-sm">{getUserDisplayName()}</p>
-                  <p className="text-xs text-gray-500">{session.user?.email}</p>
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowUserMenu(!showUserMenu)
+                }}
+                className="group relative flex justify-center items-center p-3 rounded-lg transition-all duration-200 text-gray-600 hover:text-blue-600 hover:bg-gray-50"
+              >
+                <div className="w-6 h-6 xl:w-8 xl:h-8 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xs xl:text-sm font-medium">
+                  {getUserInitials()}
                 </div>
-                <Link
-                  href="/profile"
-                  className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  <Settings size={16} />
-                  <span className="text-sm">Profil</span>
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors w-full text-left"
-                >
-                  <LogOut size={16} />
-                  <span className="text-sm">Se déconnecter</span>
-                </button>
-              </div>
-            )}
+                <span className="absolute left-16 xl:left-20 z-10 scale-0 rounded-lg bg-gray-900 px-3 py-2 text-sm text-white transition-all group-hover:scale-100 whitespace-nowrap shadow-lg">
+                  {getUserDisplayName()}
+                </span>
+              </button>
+
+              {/* Dropdown Menu Desktop */}
+              {showUserMenu && (
+                <div className="absolute left-16 xl:left-20 bottom-0 w-48 bg-white rounded-lg shadow-lg border py-2 z-50">
+                  <div className="px-4 py-2 border-b">
+                    <p className="font-medium text-gray-900 text-sm">{getUserDisplayName()}</p>
+                    <p className="text-xs text-gray-500">{session.user?.email}</p>
+                  </div>
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <Settings size={16} />
+                    <span className="text-sm">Profil</span>
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors w-full text-left"
+                  >
+                    <LogOut size={16} />
+                    <span className="text-sm">Se déconnecter</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </aside>
@@ -186,18 +200,29 @@ const Navbar = () => {
 
           {/* User Info Mobile */}
           {session ? (
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowUserMenu(!showUserMenu)
-              }}
-              className="flex items-center gap-2"
-            >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xs font-medium">
-                {getUserInitials()}
-              </div>
-              <span className="text-sm font-medium text-gray-900">{getUserDisplayName()}</span>
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Bouton de déconnexion direct mobile - Option 2 */}
+              <button
+                onClick={handleSignOut}
+                className="p-2 rounded-lg text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors"
+                title="Se déconnecter"
+              >
+                <LogOut size={20} />
+              </button>
+              
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowUserMenu(!showUserMenu)
+                }}
+                className="flex items-center gap-2"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xs font-medium">
+                  {getUserInitials()}
+                </div>
+                <span className="text-sm font-medium text-gray-900">{getUserDisplayName()}</span>
+              </button>
+            </div>
           ) : (
             <Link
               href="/auth/login"

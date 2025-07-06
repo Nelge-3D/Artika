@@ -12,10 +12,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    
-      <>
+    <>
       <Navbar/>
-        <main >{children}</main>
-      </>
+      <main className="lg:ml-16"> {/* Ajout de la marge gauche uniquement à partir du breakpoint lg */}
+        {children}
+      </main>
+    </>
   );
 }

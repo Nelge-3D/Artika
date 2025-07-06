@@ -10,6 +10,7 @@ interface GalleryHeaderProps {
   setSearchQuery: (query: string) => void
   activeCategory: string | null
   setActiveCategory: (category: string | null) => void
+  categories?: string[] // Ajoutez cette ligne
 }
 
 const CATEGORIES = ["Photographie", "3D", "2D", "Infographie", "Sculpture"] as const

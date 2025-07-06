@@ -1,0 +1,255 @@
+{
+  "artworks": [
+    {
+      "id": "1",
+      "image": "/parfum.png",
+      "title": "Eau de parfum",
+      "artist": "Louis-Gériel",
+      "tools": ["Canva", "Blender"],
+      "category": "3D",
+      "price": 120,
+      "likes": 45,
+      "description": "Une création 3D représentant un flacon de parfum luxueux."
+    },
+    {
+      "id": "2",
+      "image": "/hero2.png",
+      "title": "Esprit du désert",
+      "artist": "Fatou Diop",
+      "tools": ["Photoshop", "Blender"],
+      "category": "Photographie",
+      "price": 85,
+      "likes": 120,
+      "description": "Photographie artistique capturant l'essence du désert africain."
+    },
+    {
+      "id": "3",
+      "image": "/hero3.png",
+      "title": "Fusion",
+      "artist": "Mamadou Sagna",
+      "tools": ["Photoshop", "Blender"],
+      "category": "3D",
+      "price": 95,
+      "likes": 78,
+      "description": "Œuvre 3D explorant la fusion entre tradition et modernité."
+    },
+    {
+      "id": "4",
+      "image": "/hero4.png",
+      "title": "Identité",
+      "artist": "Ayo Kale",
+      "tools": ["Photoshop", "Blender"],
+      "category": "2D",
+      "price": 65,
+      "likes": 92,
+      "description": "Création 2D questionnant l'identité dans le monde contemporain."
+    },
+    {
+      "id": "5",
+      "image": "/hero5.png",
+      "title": "Dakar Dreams",
+      "artist": "Binta Kane",
+      "tools": ["Photoshop", "Blender"],
+      "category": "Infographie",
+      "price": 110,
+      "likes": 156,
+      "description": "Infographie poétique inspirée par les rêves de Dakar."
+    },
+    {
+      "id": "6",
+      "image": "/hero1.png",
+      "title": "Beauté Noire",
+      "artist": "Kofi Mensah",
+      "tools": ["Photoshop", "Blender"],
+      "category": "Photographie",
+      "price": 75,
+      "likes": 203,
+      "description": "Portrait artistique célébrant la beauté de la femme africaine."
+    },
+    {
+      "id": "7",
+      "image": "/hero2.png",
+      "title": "Esprit du désert",
+      "artist": "Fatou Diop",
+      "tools": ["Photoshop", "Blender"],
+      "category": "Photographie",
+      "price": 85,
+      "likes": 120,
+      "description": "Photographie artistique capturant l'essence du désert africain."
+    },
+    {
+      "id": "8",
+      "image": "/hero3.png",
+      "title": "Fusion",
+      "artist": "Mamadou Sagna",
+      "tools": ["Photoshop", "Blender"],
+      "category": "3D",
+      "price": 95,
+      "likes": 78,
+      "description": "Œuvre 3D explorant la fusion entre tradition et modernité."
+    },
+    {
+      "id": "9",
+      "image": "/hero4.png",
+      "title": "Identité",
+      "artist": "Ayo Kale",
+      "tools": ["Photoshop", "Blender"],
+      "category": "2D",
+      "price": 65,
+      "likes": 92,
+      "description": "Création 2D questionnant l'identité dans le monde contemporain."
+    },
+    {
+      "id": "10",
+      "image": "/hero5.png",
+      "title": "Dakar Dreams",
+      "artist": "Binta Kane",
+      "tools": ["Photoshop", "Blender"],
+      "category": "Infographie",
+      "price": 110,
+      "likes": 156,
+      "description": "Infographie poétique inspirée par les rêves de Dakar."
+    },
+    {
+      "id": "11",
+      "image": "/hero1.png",
+      "title": "Beauté Noire",
+      "artist": "Kofi Mensah",
+      "tools": ["Photoshop", "Blender"],
+      "category": "Photographie",
+      "price": 75,
+      "likes": 203,
+      "description": "Portrait artistique célébrant la beauté de la femme africaine."
+    },
+    {
+      "id": "12",
+      "image": "/hero2.png",
+      "title": "Esprit du désert",
+      "artist": "Fatou Diop",
+      "tools": ["Photoshop", "Blender"],
+      "category": "Photographie",
+      "price": 85,
+      "likes": 120,
+      "description": "Photographie artistique capturant l'essence du désert africain."
+    },
+    {
+      "id": "13",
+      "image": "/hero3.png",
+      "title": "Fusion",
+      "artist": "Mamadou Sagna",
+      "tools": ["Photoshop", "Blender"],
+      "category": "3D",
+      "price": 95,
+      "likes": 78,
+      "description": "Œuvre 3D explorant la fusion entre tradition et modernité."
+    },
+    {
+      "id": "14",
+      "image": "/hero4.png",
+      "title": "Identité",
+      "artist": "Ayo Kale",
+      "tools": ["Photoshop", "Blender"],
+      "category": "2D",
+      "price": 65,
+      "likes": 92,
+      "description": "Création 2D questionnant l'identité dans le monde contemporain."
+    },
+    {
+      "id": "15",
+      "image": "/hero5.png",
+      "title": "Dakar Dreams",
+      "artist": "Binta Kane",
+      "tools": ["Photoshop", "Blender"],
+      "category": "Sculpture",
+      "price": 140,
+      "likes": 187,
+      "description": "Sculpture conceptuelle inspirée par les rêves urbains de Dakar."
+    }
+  ],
+  "artists": [
+    {
+      "id": "1",
+      "name": "Louis-Gériel",
+      "avatar": "/vedette/Nelge-3D.svg",
+      "artworkCount": 1,
+      "speciality": "Design graphique",
+      "location": "Owendo, Gabon",
+      "followers": 1245,
+      "bio": "Artiste 3D spécialisé dans les créations visuelles pour marques de luxe."
+    },
+    {
+      "id": "2",
+      "name": "Fatou Diop",
+      "avatar": "/vedette/Artika.svg",
+      "artworkCount": 3,
+      "speciality": "Art digital",
+      "location": "Saint-Louis, Sénégal",
+      "followers": 2876,
+      "bio": "Photographe et artiste digitale explorant les thèmes de l'identité africaine."
+    },
+    {
+      "id": "3",
+      "name": "Mamadou Sagna",
+      "avatar": "/vedette/Kev.svg",
+      "artworkCount": 3,
+      "speciality": "Infographie 3D",
+      "location": "Owendo, Gabon",
+      "followers": 1876,
+      "bio": "Créateur 3D passionné par la fusion entre les cultures traditionnelles et contemporaines."
+    },
+    {
+      "id": "4",
+      "name": "Ayo Kale",
+      "avatar": "/vedette/Neyc.svg",
+      "artworkCount": 3,
+      "speciality": "Photomontage",
+      "location": "France, Paris",
+      "followers": 2134,
+      "bio": "Artiste franco-africain explorant les questions identitaires à travers le photomontage."
+    },
+    {
+      "id": "5",
+      "name": "Binta Kane",
+      "avatar": "/hero5.png",
+      "artworkCount": 3,
+      "speciality": "Art conceptuel",
+      "location": "Bamako, Mali",
+      "followers": 1654,
+      "bio": "Artiste conceptuelle malienne créant des œuvres entre rêve et réalité urbaine."
+    },
+    {
+      "id": "6",
+      "name": "Kofi Mensah",
+      "avatar": "/hero1.png",
+      "artworkCount": 2,
+      "speciality": "Portrait artistique",
+      "location": "Accra, Ghana",
+      "followers": 3021,
+      "bio": "Photographe portraitiste célébrant la beauté et la diversité africaine."
+    }
+  ],
+  "categories": ["3D", "Photographie", "2D", "Infographie", "Sculpture"],
+  "exhibitions": [
+    {
+      "id": "1",
+      "title": "Art Contemporain Africain",
+      "date": "2023-11-15",
+      "location": "Paris, France",
+      "featuredArtworks": ["1", "2", "6"]
+    },
+    {
+      "id": "2",
+      "title": "Visions d'Afrique",
+      "date": "2024-03-20",
+      "location": "Dakar, Sénégal",
+      "featuredArtworks": ["3", "5", "15"]
+    },
+    {
+      "id": "3",
+      "title": "Identités Plurielles",
+      "date": "2024-06-10",
+      "location": "Libreville, Gabon",
+      "featuredArtworks": ["4", "9", "14"]
+    }
+  ]
+}

@@ -3,98 +3,17 @@
 import Masonry from 'react-masonry-css'
 import ArtCard from '@/components/ui/ArtCard'
 import ArtistCard from '@/components/ui/ArtistCard'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ArtModal from '@/components/ui/ArtModal'
 import { FiFilter, FiSearch, FiX } from 'react-icons/fi'
-
-// Réutilisez les mêmes interfaces et données que dans votre feed
-interface Artwork {
-  id: string
-  image: string
-  title: string
-  artist: string
-  tools: string[]
-  category: string
-}
-
-interface Artist {
-  id: string
-  name: string
-  avatar: string
-  artworkCount: number
-  speciality: string
-  location: string
-}
-
-// Même jeu de données que dans votre feed
-const artworks: Artwork[] = [
-  { id:'1', image: '/parfum.png', title: 'Eau de parfum', artist: 'Louis-Gériel', tools: ['Canva', 'Blender'], category: '3D' },
-  { id:'2', image: '/hero2.png', title: 'Esprit du désert', artist: 'Fatou Diop', tools: ['Photoshop', 'Blender'], category: 'Photographie' },
-  { id:'3', image: '/hero3.png', title: 'Fusion', artist: 'Mamadou Sagna', tools: ['Photoshop', 'Blender'], category: '3D' },
-  { id:'4', image: '/hero4.png', title: 'Identité', artist: 'Ayo Kale', tools: ['Photoshop', 'Blender'], category: '2D' },
-  { id:'5', image: '/hero5.png', title: 'Dakar Dreams', artist: 'Binta Kane', tools: ['Photoshop', 'Blender'], category: 'Infographie' },
-  { id:'6', image: '/hero1.png', title: 'Beauté Noire', artist: 'Kofi Mensah', tools: ['Photoshop', 'Blender'], category: 'Photographie' },
-  { id:'7', image: '/hero2.png', title: 'Esprit du désert', artist: 'Fatou Diop', tools: ['Photoshop', 'Blender'], category: 'Photographie' },
-  { id:'8', image: '/hero3.png', title: 'Fusion', artist: 'Mamadou Sagna', tools: ['Photoshop', 'Blender'], category: '3D' },
-  { id:'9', image: '/hero4.png', title: 'Identité', artist: 'Ayo Kale' , tools: ['Photoshop', 'Blender'], category: '2D' },
-  { id:'10', image: '/hero5.png', title: 'Dakar Dreams', artist: 'Binta Kane', tools: ['Photoshop', 'Blender'], category: 'Infographie' },
-  { id:'11', image: '/hero1.png', title: 'Beauté Noire', artist: 'Kofi Mensah', tools: ['Photoshop', 'Blender'], category: 'Photographie' },
-  { id:'12', image: '/hero2.png', title: 'Esprit du désert', artist: 'Fatou Diop', tools: ['Photoshop', 'Blender'], category: 'Photographie' },
-  { id:'13', image: '/hero3.png', title: 'Fusion', artist: 'Mamadou Sagna' , tools: ['Photoshop', 'Blender'], category: '3D' },
-  { id:'14', image: '/hero4.png', title: 'Identité', artist: 'Ayo Kale' , tools: ['Photoshop', 'Blender'], category: '2D' },
-  { id:'15', image: '/hero5.png', title: 'Dakar Dreams', artist: 'Binta Kane' , tools: ['Photoshop', 'Blender'], category: 'Sculpture' },
-]
-
-const artists: Artist[] = [
-  { 
-    id: '1', 
-    name: 'Louis-Gériel', 
-    avatar: '/vedette/Nelge-3D.svg', 
-    artworkCount: artworks.filter(art => art.artist === 'Louis-Gériel').length,
-    speciality: 'Design graphique',
-    location: 'Owendo,Gabon'
-  },
-  { 
-    id: '2', 
-    name: 'Fatou Diop', 
-    avatar: '/vedette/Artika.svg', 
-    artworkCount: artworks.filter(art => art.artist === 'Fatou Diop').length,
-    speciality: 'Art digital',
-    location: 'Saint-Louis, Sénégal'
-  },
-  { 
-    id: '3', 
-    name: 'Mamadou Sagna', 
-    avatar: '/vedette/Kev.svg', 
-    artworkCount: artworks.filter(art => art.artist === 'Mamadou Sagna').length,
-    speciality: 'Infographie 3D',
-    location: 'Owendo, Gabon'
-  },
-  { 
-    id: '4', 
-    name: 'Ayo Kale', 
-    avatar: '/vedette/Neyc.svg', 
-    artworkCount: artworks.filter(art => art.artist === 'Ayo Kale').length,
-    speciality: 'Photomontage',
-    location: 'France, Paris'
-  },
-  { 
-    id: '5', 
-    name: 'Binta Kane', 
-    avatar: '/hero5.png', 
-    artworkCount: artworks.filter(art => art.artist === 'Binta Kane').length,
-    speciality: 'Art conceptuel',
-    location: 'Bamako, Mali'
-  },
-  { 
-    id: '6', 
-    name: 'Kofi Mensah', 
-    avatar: '/hero1.png', 
-    artworkCount: artworks.filter(art => art.artist === 'Kofi Mensah').length,
-    speciality: 'Portrait artistique',
-    location: 'Accra, Ghana'
-  },
-]
+import { 
+  getArtworks, 
+  getArtists, 
+  getCategories,
+  getArtworkById,
+  type Artwork, 
+  type Artist 
+} from '@/app/data/dataservices'
 
 const breakpointColumnsObj = {
   default: 4,
@@ -123,15 +42,43 @@ export default function ExplorePage() {
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null)
   const [activeFilters, setActiveFilters] = useState<FilterOption[]>([])
   const [showFilterPanel, setShowFilterPanel] = useState(false)
+  const [artworks, setArtworks] = useState<Artwork[]>([])
+  const [artists, setArtists] = useState<Artist[]>([])
+  const [categories, setCategories] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [artworksData, artistsData, categoriesData] = await Promise.all([
+          getArtworks(),
+          getArtists(),
+          getCategories()
+        ])
+        setArtworks(artworksData)
+        setArtists(artistsData)
+        setCategories(categoriesData)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   // Options de filtrage
-  const categoryOptions = Array.from(new Set(artworks.map(art => art.category)))
+  const categoryOptions = categories
   const artistOptions = Array.from(new Set(artworks.map(art => art.artist)))
   const toolOptions = Array.from(new Set(artworks.flatMap(art => art.tools)))
   const locationOptions = Array.from(new Set(artists.map(artist => artist.location)))
 
-  const handleCardClick = (art: Artwork) => {
-    setSelectedArtwork(art)
+  const handleCardClick = async (art: Artwork) => {
+    const fullArtwork = await getArtworkById(art.id)
+    if (fullArtwork) {
+      setSelectedArtwork(fullArtwork)
+    }
   }
 
   const closeModal = () => {
@@ -162,7 +109,8 @@ export default function ExplorePage() {
     // Filtre par recherche
     const matchesSearch = 
       art.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      art.artist.toLowerCase().includes(searchQuery.toLowerCase())
+      art.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      art.description?.toLowerCase().includes(searchQuery.toLowerCase())
     
     // Filtre par filtres actifs
     const matchesFilters = activeFilters.every(filter => {
@@ -203,6 +151,14 @@ export default function ExplorePage() {
     
     return matchesSearch && matchesFilters
   })
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
 
   return (
     <main className="bg-white min-h-screen">
@@ -368,7 +324,9 @@ export default function ExplorePage() {
               <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                 <div className="text-center p-4">
                   <h3 className="text-white text-xl font-bold mb-2">Art 3D Africain</h3>
-                  <p className="text-white text-sm">15 œuvres</p>
+                  <p className="text-white text-sm">
+                    {artworks.filter(a => a.category === '3D').length} œuvres
+                  </p>
                 </div>
               </div>
             </div>
@@ -378,7 +336,9 @@ export default function ExplorePage() {
               <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                 <div className="text-center p-4">
                   <h3 className="text-white text-xl font-bold mb-2">Portraits Modernes</h3>
-                  <p className="text-white text-sm">23 œuvres</p>
+                  <p className="text-white text-sm">
+                    {artworks.filter(a => a.category === 'Photographie').length} œuvres
+                  </p>
                 </div>
               </div>
             </div>
@@ -388,7 +348,9 @@ export default function ExplorePage() {
               <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                 <div className="text-center p-4">
                   <h3 className="text-white text-xl font-bold mb-2">Artistes Émergents</h3>
-                  <p className="text-white text-sm">8 artistes</p>
+                  <p className="text-white text-sm">
+                    {artists.filter(a => a.followers && a.followers < 2000).length} artistes
+                  </p>
                 </div>
               </div>
             </div>
@@ -449,6 +411,7 @@ export default function ExplorePage() {
                     artworkCount={artist.artworkCount}
                     speciality={artist.speciality}
                     location={artist.location}
+                    //followers={artist.followers}
                   />
                 </div>
               ))}

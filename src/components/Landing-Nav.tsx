@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import emailjs from 'emailjs-com'
+import emailjs from '@emailjs/browser'
 
 export default function LandingNavbar() {
   const [showModal, setShowModal] = useState(false)
@@ -25,14 +25,14 @@ export default function LandingNavbar() {
   const sendEmail = (e: React.FormEvent) => {
     e.preventDefault()
     emailjs.send(
-      'service_xtljuc5',
-      'template_9x75m6i',
+      process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+      process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
       {
         from_name: formData.name,
         reply_to: formData.email,
         message: formData.message,
       },
-      'XPCv6V8I45kCopLxC'
+      process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
     )
     .then(() => {
       setIsSent(true)

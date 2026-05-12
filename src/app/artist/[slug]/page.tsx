@@ -7,17 +7,7 @@ import { Metadata } from 'next'
 import Navbar from '@/components/ui/Navbar'
 import { Heart, MessageCircle, Share2, MapPin, Calendar, Eye, Download, Filter, Search, Star, Camera, Palette, User } from 'lucide-react'
 import { getArtworks, getArtistBySlug, getArtworksByArtist } from '@/app/data/artistsdataservices'
-
-function slugify(name: string) {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
-}
+import { slugify } from '@/lib/slugify'
 
 export async function generateMetadata({ 
   params 

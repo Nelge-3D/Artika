@@ -51,7 +51,7 @@ export default function Hero() {
         {displayedImages.map((src, i) => (
           <Image
             key={`left-${i}`}
-            src={displayedImages[(i + offset) % images.length]}
+            src={displayedImages[(i + offset) % displayedImages.length]}
             alt={`Œuvre ${i + 1}`}
             width={128}
             height={192}
@@ -65,7 +65,7 @@ export default function Hero() {
         {displayedImages.map((src, i) => (
           <Image
             key={`right-${i}`}
-            src={displayedImages[(i + offset) % images.length]}
+            src={displayedImages[(i + offset) % displayedImages.length]}
             alt={`Œuvre ${i + 1}`}
             width={128}
             height={192}

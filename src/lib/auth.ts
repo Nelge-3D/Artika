@@ -18,24 +18,20 @@ export const authOptions: AuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           return null
         }
 
         try {
-          // Vérifier si l'utilisateur existe
           const user = await prisma.user.findUnique({
-            where: {
-              email: credentials.email
-            }
+            where: { email: credentials.email }
           })
 
           if (!user || !user.password) {
             return null
           }
 
-          // Vérifier le mot de passe
           const isPasswordValid = await bcrypt.compare(
             credentials.password,
             user.password
@@ -61,22 +57,31 @@ export const authOptions: AuthOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
 
+  // JWT obligatoire pour CredentialsProvider — database sessions ne fonctionnent
+  // pas avec credentials (limitation NextAuth v4 documentée).
   session: {
-    strategy: "database", // Utiliser la base de données avec Prisma
-    maxAge: 30 * 24 * 60 * 60, // 30 jours
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
   },
 
   callbacks: {
-    async session({ session, user }) {
-      if (session?.user && user) {
-        session.user.id = user.id
-        session.user.firstName = user.firstName
-        session.user.lastName = user.lastName
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.firstName = (user as { firstName?: string }).firstName
+        token.lastName = (user as { lastName?: string }).lastName
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string
+        session.user.firstName = token.firstName as string | undefined
+        session.user.lastName = token.lastName as string | undefined
       }
       return session
     },
-    async signIn({ user, account, profile }) {
-      // Permettre la connexion pour tous les providers
+    async signIn() {
       return true
     },
   },
@@ -84,14 +89,6 @@ export const authOptions: AuthOptions = {
   pages: {
     signIn: "/auth/login",
     error: "/auth/error",
-  },
-
-  events: {
-    async signIn({ user, account, profile, isNewUser }) {
-      if (isNewUser) {
-        console.log("Nouvel utilisateur créé:", user.email)
-      }
-    },
   },
 
   debug: process.env.NODE_ENV === "development",

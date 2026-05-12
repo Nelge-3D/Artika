@@ -1,5 +1,6 @@
 // app/data/services.ts
 import data from '@/app/data/artistsdata.json'
+import { slugify } from '@/lib/slugify'
 
 export function getArtworks() {
   return data.artworks
@@ -15,15 +16,4 @@ export function getArtistBySlug(slug: string) {
 
 export function getArtworksByArtist(artistName: string) {
   return data.artworks.filter(art => slugify(art.artist) === artistName)
-}
-
-function slugify(name: string) {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
 }

@@ -5,18 +5,7 @@ import Link from 'next/link'
 import { Bookmark, Share2, Heart, MessageCircle, Eye, Calendar, Tag, User, ExternalLink, Download, Flag, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-
-// Fonction slugify cohérente avec celle de la page artiste
-function slugify(name: string) {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
-}
+import { slugify } from '@/lib/slugify'
 
 export default function ArtModal({
   artwork,
@@ -234,7 +223,7 @@ export default function ArtModal({
                       <span className="text-sm font-medium">Commenter</span>
                     </button>
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     {artwork.popularity && (
                       <div className="flex items-center gap-1">

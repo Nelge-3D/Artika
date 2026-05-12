@@ -13,7 +13,7 @@ interface GalleryHeaderProps {
   categories?: string[] // Ajoutez cette ligne
 }
 
-const CATEGORIES = ["Photographie", "3D", "2D", "Infographie", "Sculpture"] as const
+const FALLBACK_CATEGORIES = ["Photographie", "3D", "2D", "Infographie", "Sculpture"]
 
 // Configuration des artistes en vedette
 const FEATURED_ARTISTS: FeaturedArtist[] = [
@@ -43,14 +43,16 @@ const FEATURED_ARTISTS: FeaturedArtist[] = [
   }
 ]
 
-const GalleryHeader = memo(function GalleryHeader({ 
-  activeTab, 
-  setActiveTab, 
-  searchQuery, 
+const GalleryHeader = memo(function GalleryHeader({
+  activeTab,
+  setActiveTab,
+  searchQuery,
   setSearchQuery,
   activeCategory,
-  setActiveCategory
+  setActiveCategory,
+  categories,
 }: GalleryHeaderProps) {
+  const displayCategories = categories ?? FALLBACK_CATEGORIES
   // État pour l'artiste en vedette actuel
   const [featuredArtistIndex, setFeaturedArtistIndex] = useState(0)
   const currentArtist = FEATURED_ARTISTS[featuredArtistIndex]
@@ -160,7 +162,7 @@ const GalleryHeader = memo(function GalleryHeader({
               >
                 Toutes
               </button>
-              {CATEGORIES.map((cat) => (
+              {displayCategories.map((cat) => (
                 <button
                   key={cat}
                   className={`snap-start px-3 sm:px-5 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-base focus:ring-2 focus:ring-purple-500 focus:outline-none whitespace-nowrap ${

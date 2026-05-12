@@ -3,6 +3,7 @@
 import { memo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { slugify } from '@/lib/slugify'
 
 interface ArtistCardProps {
   name: string
@@ -11,17 +12,6 @@ interface ArtistCardProps {
   speciality: string
   location: string
   onClick?: () => void
-}
-
-function slugify(name: string) {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
 }
 
 const ArtistCard = memo(function ArtistCard({ 

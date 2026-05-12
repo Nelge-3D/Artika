@@ -106,10 +106,7 @@ export default function UploadPage() {
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
-    // Logique de soumission
-    console.log('Artwork data:', formData)
-    console.log('Files:', files)
-    // Ici vous ajouteriez l'appel API pour envoyer les données
+    // TODO: implémenter l'appel API POST /api/artworks avec upload vers un service de stockage
   }, [formData, files])
 
   return (

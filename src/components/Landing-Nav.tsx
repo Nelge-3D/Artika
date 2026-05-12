@@ -4,8 +4,10 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import emailjs from '@emailjs/browser'
+import { useSession } from 'next-auth/react'
 
 export default function LandingNavbar() {
+  const { data: session } = useSession()
   const [showModal, setShowModal] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [isSent, setIsSent] = useState(false)
@@ -75,15 +77,26 @@ export default function LandingNavbar() {
               Nous contacter
             </button>
             <div className="flex gap-3 ml-4">
-              <Link href="/auth/login" className={`hover:underline transition-colors ${scrolled ? 'text-blue-600' : 'text-white'}`}>
-                Se connecter
-              </Link>
-              <Link
-                href="/auth/register"
-                className="bg-purple-600 text-white px-4 py-1 rounded-full hover:bg-purple-700"
-              >
-                S&apos;inscrire
-              </Link>
+              {session ? (
+                <Link
+                  href="/feed"
+                  className="bg-purple-600 text-white px-5 py-2 rounded-full hover:bg-purple-700 font-medium"
+                >
+                  Accéder au feed →
+                </Link>
+              ) : (
+                <>
+                  <Link href="/auth/login" className={`hover:underline transition-colors ${scrolled ? 'text-blue-600' : 'text-white'}`}>
+                    Se connecter
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="bg-purple-600 text-white px-4 py-1 rounded-full hover:bg-purple-700"
+                  >
+                    S&apos;inscrire
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
 
@@ -137,20 +150,32 @@ export default function LandingNavbar() {
                   Nous contacter
                 </button>
                 <div className="flex gap-3 pt-2">
-                  <Link
-                    href="/auth/login"
-                    className="text-blue-600 hover:underline"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Se connecter
-                  </Link>
-                  <Link
-                    href="/auth/register"
-                    className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    S&apos;inscrire
-                  </Link>
+                  {session ? (
+                    <Link
+                      href="/feed"
+                      className="bg-purple-600 text-white px-5 py-2 rounded-full hover:bg-purple-700 font-medium"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Accéder au feed →
+                    </Link>
+                  ) : (
+                    <>
+                      <Link
+                        href="/auth/login"
+                        className="text-blue-600 hover:underline"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Se connecter
+                      </Link>
+                      <Link
+                        href="/auth/register"
+                        className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        S&apos;inscrire
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>

@@ -8,6 +8,7 @@ import Navbar from '@/components/ui/Navbar'
 import { Heart, MessageCircle, Share2, MapPin, Calendar, Eye, Download, Filter, Search, Star, Camera, Palette, User } from 'lucide-react'
 import { getArtworks, getArtistBySlug, getArtworksByArtist } from '@/app/data/artistsdataservices'
 import { slugify } from '@/lib/slugify'
+import UserAvatar from '@/components/ui/UserAvatar'
 
 export async function generateMetadata({ 
   params 
@@ -15,7 +16,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }> 
 }): Promise<Metadata> {
   const { slug } = await params
-  const artworks = getArtworks()
+  const artworks = await getArtworks()
   const artist = artworks.find(a => slugify(a.artist) === slug)?.artist || 'Artiste'
   return {
     title: `${artist} - Portfolio créatif`,
@@ -31,9 +32,11 @@ export default async function ArtistPage({
   const { slug } = await params
   
   // Récupération des données via les services
-  const artistArtworks = getArtworksByArtist(slug)
-  const artistData = getArtistBySlug(slug)
-  const allArtworks = getArtworks()
+  const [artistArtworks, artistData, allArtworks] = await Promise.all([
+    getArtworksByArtist(slug),
+    getArtistBySlug(slug),
+    getArtworks(),
+  ])
 
   if (artistArtworks.length === 0) return notFound()
 
@@ -55,12 +58,13 @@ export default async function ArtistPage({
     education: 'Autodidacte',
     website: '',
     instagram: '',
-    behance: ''
+    behance: '',
+    image: null
   }
 
   const finalArtistData = artistData || defaultArtistData
   
-  const artistIcon = `/avatars/${slug}.png`
+  const artistIcon = finalArtistData.image || null
   const popularity = Math.round(
     artistArtworks.reduce((acc, art) => acc + art.popularity, 0) / artistArtworks.length
   )
@@ -82,12 +86,11 @@ export default async function ArtistPage({
               {/* Avatar et infos principales */}
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 flex-1">
                 <div className="relative">
-                  <Image
+                  <UserAvatar
+                    name={artistName}
                     src={artistIcon}
-                    alt={artistName}
-                    width={120}
-                    height={120}
-                    className="rounded-full border-4 border-white shadow-xl object-cover w-30 h-30"
+                    size={120}
+                    className="border-4 border-white shadow-xl"
                   />
                   <div className="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-2 border-white"></div>
                 </div>
@@ -338,12 +341,9 @@ export default async function ArtistPage({
                     href={`/artist/${slugify(art.artist)}`}
                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
                   >
-                    <Image
-                      src={`/avatars/${slugify(art.artist)}.png`}
-                      alt={art.artist}
-                      width={40}
-                      height={40}
-                      className="rounded-full object-cover"
+                    <UserAvatar
+                      name={art.artist}
+                      size={40}
                     />
                     <div className="flex-1">
                       <div className="font-medium text-sm">{art.artist}</div>

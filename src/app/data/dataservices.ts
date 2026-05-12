@@ -1,70 +1,73 @@
-// services/dataService.ts
-import data from '@/app/data/data.json';
-
 export interface Artwork {
-  id: string;
-  image: string;
-  title: string;
-  artist: string;
-  tools: string[];
-  category: string;
-  price?: number;
-  likes?: number;
-  description?: string;
+  id: string
+  image: string
+  title: string
+  artist: string
+  artistId?: string
+  artistImage?: string | null
+  tools: string[]
+  category: string
+  likes?: number
+  views?: number
+  popularity?: number
+  description?: string
+  year?: number
 }
 
 export interface Artist {
-  id: string;
-  name: string;
-  avatar: string;
-  artworkCount: number;
-  speciality: string;
-  location: string;
-  followers?: number;
-  bio?: string;
+  id: string
+  name: string
+  avatar: string
+  artworkCount: number
+  speciality: string
+  location: string
+  followers?: number
+  bio?: string
 }
 
-export interface Exhibition {
-  id: string;
-  title: string;
-  date: string;
-  location: string;
-  featuredArtworks: string[];
+async function fetchArtworks(params?: Record<string, string>): Promise<Artwork[]> {
+  const query = params ? '?' + new URLSearchParams(params).toString() : ''
+  const res = await fetch(`/api/artworks${query}`, { cache: 'no-store' })
+  if (!res.ok) return []
+  return res.json()
 }
 
-export const getArtworks = async (): Promise<Artwork[]> => {
-  return data.artworks;
-};
+export const getArtworks = (): Promise<Artwork[]> => fetchArtworks()
 
 export const getArtworkById = async (id: string): Promise<Artwork | undefined> => {
-  return data.artworks.find(art => art.id === id);
-};
+  const all = await fetchArtworks()
+  return all.find((a) => a.id === id)
+}
+
+export const getArtworksByCategory = (category: string): Promise<Artwork[]> =>
+  fetchArtworks({ category })
+
+export const searchArtworks = (query: string): Promise<Artwork[]> =>
+  fetchArtworks({ search: query })
 
 export const getArtists = async (): Promise<Artist[]> => {
-  return data.artists;
-};
+  const artworks = await fetchArtworks()
+  const byArtist = new Map<string, { artworks: Artwork[]; id: string }>()
 
-export const getArtistById = async (id: string): Promise<Artist | undefined> => {
-  return data.artists.find(artist => artist.id === id);
-};
+  for (const art of artworks) {
+    const key = art.artist
+    if (!byArtist.has(key)) {
+      byArtist.set(key, { artworks: [], id: art.artistId || art.artist })
+    }
+    byArtist.get(key)!.artworks.push(art)
+  }
+
+  return Array.from(byArtist.entries()).map(([name, { artworks: arts, id }]) => ({
+    id,
+    name,
+    avatar: arts[0]?.image || '/avatars/default.png',
+    artworkCount: arts.length,
+    speciality: arts[0]?.category || 'Art numérique',
+    location: 'Gabon',
+  }))
+}
 
 export const getCategories = async (): Promise<string[]> => {
-  return data.categories;
-};
-
-export const getExhibitions = async (): Promise<Exhibition[]> => {
-  return data.exhibitions;
-};
-
-export const getArtworksByCategory = async (category: string): Promise<Artwork[]> => {
-  return data.artworks.filter(art => art.category === category);
-};
-
-export const searchArtworks = async (query: string): Promise<Artwork[]> => {
-  const q = query.toLowerCase();
-  return data.artworks.filter(art =>
-    art.title.toLowerCase().includes(q) ||
-    art.artist.toLowerCase().includes(q) ||
-    art.description?.toLowerCase().includes(q)
-  );
-};
+  const artworks = await fetchArtworks()
+  return [...new Set(artworks.map((a) => a.category))]
+}

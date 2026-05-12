@@ -23,10 +23,9 @@ const Navbar = () => {
 
   // Navigation items pour utilisateurs connectés
   const userNavItems = [
-    { href: '/', icon: <Home size={20} />, label: 'Home' },
-    { href: '/feed', icon: <Compass size={20} />, label: 'Feed' },
+    { href: '/feed', icon: <Home size={20} />, label: 'Feed' },
     { href: '/upload', icon: <Upload size={20} />, label: 'Publier' },
-    { href: '/explore', icon: <Compass size={20} />, label: 'Explorer' },
+    { href: '/user', icon: <User size={20} />, label: 'Mon profil' },
   ]
 
   // Choisir les items de navigation selon l'état de connexion
@@ -157,7 +156,7 @@ const Navbar = () => {
                     <p className="text-xs text-gray-500">{session.user?.email}</p>
                   </div>
                   <Link
-                    href="/profile"
+                    href="/user"
                     className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     <Settings size={16} />
@@ -243,7 +242,7 @@ const Navbar = () => {
             </div>
             <div className="px-4 py-2">
               <Link
-                href="/profile"
+                href="/user"
                 className="flex items-center gap-3 py-2 text-gray-700 hover:text-blue-600"
               >
                 <Settings size={16} />

@@ -65,8 +65,20 @@ export async function getArtworks(): Promise<ArtistArtwork[]> {
 
 export async function getArtistBySlug(slug: string): Promise<ArtistProfile | null> {
   const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      firstName: true,
+      lastName: true,
+      image: true,
+      bio: true,
+      location: true,
+      website: true,
+      instagram: true,
+      interests: true,
+      createdAt: true,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    select: { id: true, name: true, firstName: true, lastName: true, image: true, createdAt: true } as any,
+    } as any,
   })
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,16 +88,17 @@ export async function getArtistBySlug(slug: string): Promise<ArtistProfile | nul
   })
   if (!user) return null
 
-  const displayName = user.name || `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const interests: string[] = Array.isArray((user as any).interests) ? (user as any).interests : []
+  const u = user as any
+  const displayName = u.name || `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim()
+  const interests: string[] = Array.isArray(u.interests) ? u.interests : []
 
   return {
     name: displayName,
-    image: user.image ?? null,
-    bio: `${displayName} est un artiste visuel partageant ses créations sur ArTika.`,
-    location: 'Gabon',
-    joinDate: new Date(user.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
+    image: u.image ?? null,
+    bio: u.bio || `${displayName} est un artiste visuel partageant ses créations sur ArTika.`,
+    location: u.location || 'Gabon',
+    joinDate: new Date(u.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
     followers: 0,
     following: 0,
     totalViews: 0,
@@ -94,8 +107,8 @@ export async function getArtistBySlug(slug: string): Promise<ArtistProfile | nul
     skills: interests.length > 0 ? interests : ['Art numérique'],
     experience: 'Artiste',
     education: 'Autodidacte',
-    website: '',
-    instagram: '',
+    website: u.website || '',
+    instagram: u.instagram || '',
     behance: '',
   }
 }

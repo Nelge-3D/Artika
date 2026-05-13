@@ -1,7 +1,13 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, memo, useState } from 'react'
 import { SearchIcon } from '@/components/icons'
+import { slugify } from '@/lib/slugify'
+import type { FeaturedArtist } from '@/app/data/dataservices'
+import UserAvatar from '@/components/ui/UserAvatar'
+
+export type { FeaturedArtist }
 
 interface GalleryHeaderProps {
   activeTab: 'artists' | 'artworks'
@@ -10,38 +16,11 @@ interface GalleryHeaderProps {
   setSearchQuery: (query: string) => void
   activeCategory: string | null
   setActiveCategory: (category: string | null) => void
-  categories?: string[] // Ajoutez cette ligne
+  categories?: string[]
+  featuredArtists?: FeaturedArtist[]
 }
 
-const FALLBACK_CATEGORIES = ["Photographie", "3D", "2D", "Infographie", "Sculpture"]
-
-// Configuration des artistes en vedette
-const FEATURED_ARTISTS: FeaturedArtist[] = [
-  {
-    id: 'nelge-3d',
-    name: 'NELGE-3D',
-    displayName: 'NELGE-3D',
-    backgroundImage: '/vedette/Nelge-3D.svg'
-  },
-  {
-    id: 'marie-dance',
-    name: 'MARie',
-    displayName: 'Marie',
-    backgroundImage: '/vedette/Artika.svg'
-  },
-  {
-    id: 'kev-digital',
-    name: 'Kev Graphix', 
-    displayName: 'Kev Graphix',
-    backgroundImage: '/vedette/Kev.svg'
-  },
-  {
-    id: 'sophie-sculpt',
-    name: 'Neyc Photography',
-    displayName: 'Neyc', 
-    backgroundImage: '/vedette/Neyc.svg'
-  }
-]
+const FALLBACK_CATEGORIES = ['Photographie', '3D', '2D', 'Infographie', 'Sculpture']
 
 const GalleryHeader = memo(function GalleryHeader({
   activeTab,
@@ -51,11 +30,11 @@ const GalleryHeader = memo(function GalleryHeader({
   activeCategory,
   setActiveCategory,
   categories,
+  featuredArtists = [],
 }: GalleryHeaderProps) {
   const displayCategories = categories ?? FALLBACK_CATEGORIES
-  // État pour l'artiste en vedette actuel
-  const [featuredArtistIndex, setFeaturedArtistIndex] = useState(0)
-  const currentArtist = FEATURED_ARTISTS[featuredArtistIndex]
+  const [featuredIndex, setFeaturedIndex] = useState(0)
+  const currentArtist = featuredArtists[featuredIndex] ?? null
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
@@ -65,25 +44,28 @@ const GalleryHeader = memo(function GalleryHeader({
     setActiveTab(tab)
   }, [setActiveTab])
 
-  // Fonction pour changer d'artiste en vedette
-  const handleFeaturedArtistChange = useCallback(() => {
-    setFeaturedArtistIndex((prev) => (prev + 1) % FEATURED_ARTISTS.length)
-  }, [])
+  const handleNextArtist = useCallback(() => {
+    if (featuredArtists.length === 0) return
+    setFeaturedIndex((prev) => (prev + 1) % featuredArtists.length)
+  }, [featuredArtists.length])
 
   return (
     <>
       <header className="relative h-auto min-h-[400px] md:h-[500px] lg:h-[600px] w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-red-800 to-purple-800 overflow-hidden">
-          <div 
-            className="absolute inset-0 opacity-50 bg-center bg-cover transition-all duration-700 ease-in-out"
-            style={{ backgroundImage: `url('${currentArtist.backgroundImage}')` }}
-            aria-hidden="true"
-          />
+          {currentArtist?.image && (
+            <div
+              className="absolute inset-0 opacity-50 bg-center bg-cover transition-all duration-700 ease-in-out"
+              style={{ backgroundImage: `url('${currentArtist.image}')` }}
+              aria-hidden="true"
+            />
+          )}
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center py-8">
-          <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sm:mb-0 sm:absolute sm:top-6">
-            <div className="relative w-full sm:max-w-md order-2 sm:order-1">
+          {/* Barre de recherche */}
+          <div className="w-full flex justify-start sm:absolute sm:top-6 mb-8 sm:mb-0">
+            <div className="relative w-full sm:max-w-md">
               <label htmlFor="art-search" className="sr-only">Rechercher une œuvre ou un artiste</label>
               <input
                 id="art-search"
@@ -94,28 +76,13 @@ const GalleryHeader = memo(function GalleryHeader({
                 onChange={handleSearchChange}
                 aria-label="Recherche dans la galerie"
               />
-              <button 
+              <button
                 className="absolute right-3 top-1/2 transform -translate-y-1/2"
                 aria-label="Lancer la recherche"
                 tabIndex={0}
               >
                 <SearchIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </button>
-            </div>
-
-            <div className="flex items-center gap-3 sm:gap-6 order-1 sm:order-2 self-end sm:self-auto">
-              <div className="text-right">
-                <p className="text-white font-medium text-sm sm:text-base">ORLINE ENGLISH</p>
-                <p className="text-white text-xs sm:text-sm">5 minutes</p>
-              </div>
-              <div 
-                className="w-8 h-8 sm:w-10 sm:mr-8 sm:h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 cursor-pointer hover:bg-white/30 transition-colors"
-                role="button"
-                aria-label="Profil utilisateur"
-                tabIndex={0}
-              >
-                <span className="font-bold text-white text-sm sm:text-base">OE</span>
-              </div>
             </div>
           </div>
 
@@ -125,12 +92,12 @@ const GalleryHeader = memo(function GalleryHeader({
                 Galerie des œuvres
               </h1>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center sm:justify-start">
-                <TabButton 
+                <TabButton
                   active={activeTab === 'artists'}
                   onClick={() => handleTabChange('artists')}
                   label="Artistes"
                 />
-                <TabButton 
+                <TabButton
                   active={activeTab === 'artworks'}
                   onClick={() => handleTabChange('artworks')}
                   label="Œuvres"
@@ -138,25 +105,26 @@ const GalleryHeader = memo(function GalleryHeader({
               </div>
             </div>
 
-            <FeaturedBadge 
-              artist={currentArtist}
-              onArtistChange={handleFeaturedArtistChange}
-              currentIndex={featuredArtistIndex}
-              totalArtists={FEATURED_ARTISTS.length}
-            />
+            {currentArtist && (
+              <FeaturedBadge
+                artist={currentArtist}
+                onNext={handleNextArtist}
+                currentIndex={featuredIndex}
+                total={featuredArtists.length}
+              />
+            )}
           </div>
         </div>
       </header>
 
+      {/* Filtres catégories */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 -mt-8 sm:-mt-10 z-10 relative">
         <div className="bg-white rounded-xl shadow-lg p-2 sm:p-3">
           <nav aria-label="Filtres de catégories">
-            <div className="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar snap-x justify-start sm:justify-start">
+            <div className="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar snap-x justify-start">
               <button
                 className={`snap-start px-3 sm:px-5 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-base focus:ring-2 focus:ring-purple-500 focus:outline-none whitespace-nowrap ${
-                  activeCategory === null 
-                    ? 'bg-purple-500 text-white' 
-                    : 'bg-gray-100 hover:bg-gray-200'
+                  activeCategory === null ? 'bg-purple-500 text-white' : 'bg-gray-100 hover:bg-gray-200'
                 }`}
                 onClick={() => setActiveCategory(null)}
               >
@@ -166,9 +134,7 @@ const GalleryHeader = memo(function GalleryHeader({
                 <button
                   key={cat}
                   className={`snap-start px-3 sm:px-5 py-2 sm:py-3 rounded-full font-medium transition-colors text-sm sm:text-base focus:ring-2 focus:ring-purple-500 focus:outline-none whitespace-nowrap ${
-                    cat === activeCategory 
-                      ? 'bg-purple-500 text-white' 
-                      : 'bg-gray-100 hover:bg-gray-200'
+                    cat === activeCategory ? 'bg-purple-500 text-white' : 'bg-gray-100 hover:bg-gray-200'
                   }`}
                   onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
                 >
@@ -183,7 +149,7 @@ const GalleryHeader = memo(function GalleryHeader({
   )
 })
 
-// Sous-composants :
+// ── Sous-composants ───────────────────────────────────────────────────────────
 
 interface TabButtonProps {
   active: boolean
@@ -193,10 +159,10 @@ interface TabButtonProps {
 
 const TabButton = memo(function TabButton({ active, onClick, label }: TabButtonProps) {
   return (
-    <button 
+    <button
       className={`w-full sm:w-auto px-6 py-2 rounded-full text-base lg:text-lg font-medium transition-all ${
-        active 
-          ? 'bg-white text-purple-900 shadow-lg hover:shadow-xl' 
+        active
+          ? 'bg-white text-purple-900 shadow-lg hover:shadow-xl'
           : 'bg-transparent text-white border border-white hover:bg-white/10'
       }`}
       onClick={onClick}
@@ -207,50 +173,54 @@ const TabButton = memo(function TabButton({ active, onClick, label }: TabButtonP
   )
 })
 
-// Type pour un artiste en vedette
-type FeaturedArtist = {
-  id: string
-  name: string
-  displayName: string
-  backgroundImage: string
-}
-
 interface FeaturedBadgeProps {
   artist: FeaturedArtist
-  onArtistChange: () => void
+  onNext: () => void
   currentIndex: number
-  totalArtists: number
+  total: number
 }
 
-const FeaturedBadge = memo(function FeaturedBadge({ 
-  artist, 
-  onArtistChange, 
-  currentIndex, 
-  totalArtists 
-}: FeaturedBadgeProps) {
+const FeaturedBadge = memo(function FeaturedBadge({ artist, onNext, currentIndex, total }: FeaturedBadgeProps) {
   return (
     <div className="text-center sm:text-left lg:text-right">
       <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl inline-block hover:bg-white/30 transition-colors">
         <div className="flex items-center justify-between gap-3 mb-2">
           <p className="text-white font-bold text-lg lg:text-xl">En vedette</p>
-          <button
-            onClick={onArtistChange}
-            className="text-white hover:text-gray-200 transition-colors text-xs bg-white/20 px-2 py-1 rounded-full"
-            aria-label="Changer d'artiste en vedette"
-          >
-            {currentIndex + 1}/{totalArtists}
-          </button>
+          {total > 1 && (
+            <button
+              onClick={onNext}
+              className="text-white hover:text-gray-200 transition-colors text-xs bg-white/20 px-2 py-1 rounded-full"
+              aria-label="Artiste suivant"
+            >
+              {currentIndex + 1}/{total}
+            </button>
+          )}
         </div>
-        <p className="text-white text-xs lg:text-sm font-medium mb-2">
-          {artist.displayName}
-        </p>
-        <button
-          onClick={onArtistChange}
-          className="text-white/80 hover:text-white text-xs transition-colors underline"
-          aria-label={`Passer à l'artiste suivant`}
+        <Link
+          href={`/artist/${slugify(artist.name)}`}
+          className="flex items-center gap-3 group"
         >
-          Suivant →
-        </button>
+          <UserAvatar name={artist.name} src={artist.image} size={48} className="ring-2 ring-white/50 flex-shrink-0" />
+          <div>
+            <p className="text-white font-medium text-sm lg:text-base mb-0.5 group-hover:underline">
+              {artist.name}
+            </p>
+            {artist.bio && (
+              <p className="text-white/70 text-xs line-clamp-2 max-w-[180px]">{artist.bio}</p>
+            )}
+            <span className="text-white/80 hover:text-white text-xs transition-colors mt-1 block">
+              Voir le profil →
+            </span>
+          </div>
+        </Link>
+        {total > 1 && (
+          <button
+            onClick={onNext}
+            className="text-white/70 hover:text-white text-xs transition-colors mt-2 underline"
+          >
+            Suivant →
+          </button>
+        )}
       </div>
     </div>
   )

@@ -1,18 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import emailjs from '@emailjs/browser'
 import { useSession } from 'next-auth/react'
 
+const SEND_COOLDOWN_MS = 60_000 // 1 minute entre deux envois
+
 export default function LandingNavbar() {
   const { data: session } = useSession()
   const [showModal, setShowModal] = useState(false)
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const [formData, setFormData] = useState({ name: '', email: '', message: '', website: '' })
   const [isSent, setIsSent] = useState(false)
+  const [sendError, setSendError] = useState('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const lastSentAt = useRef<number>(0)
 
   // Gère le scroll
   useEffect(() => {
@@ -26,6 +30,31 @@ export default function LandingNavbar() {
 
   const sendEmail = (e: React.FormEvent) => {
     e.preventDefault()
+    setSendError('')
+
+    // Honeypot : si le champ caché est rempli, c'est un bot
+    if (formData.website) return
+
+    // Validation longueurs
+    if (formData.name.trim().length === 0 || formData.name.length > 100) {
+      setSendError('Nom invalide (1–100 caractères)')
+      return
+    }
+    if (formData.message.trim().length === 0 || formData.message.length > 2000) {
+      setSendError('Message invalide (1–2000 caractères)')
+      return
+    }
+
+    // Cooldown : 1 envoi max par minute
+    const now = Date.now()
+    if (now - lastSentAt.current < SEND_COOLDOWN_MS) {
+      const remaining = Math.ceil((SEND_COOLDOWN_MS - (now - lastSentAt.current)) / 1000)
+      setSendError(`Veuillez patienter ${remaining} secondes avant de renvoyer.`)
+      return
+    }
+
+    lastSentAt.current = now
+
     emailjs.send(
       process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
       process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
@@ -38,14 +67,14 @@ export default function LandingNavbar() {
     )
     .then(() => {
       setIsSent(true)
-      setFormData({ name: '', email: '', message: '' })
+      setFormData({ name: '', email: '', message: '', website: '' })
       setTimeout(() => {
         setIsSent(false)
         setShowModal(false)
       }, 2000)
     })
-    .catch((err) => {
-      console.error(err)
+    .catch(() => {
+      setSendError('Erreur lors de l\'envoi. Veuillez réessayer.')
     })
   }
 
@@ -207,10 +236,21 @@ export default function LandingNavbar() {
                 <p className="text-green-600 font-medium text-center">Message envoyé avec succès !</p>
               ) : (
                 <form onSubmit={sendEmail} className="space-y-4">
+                  {/* Honeypot — caché aux humains, rempli par les bots */}
+                  <input
+                    type="text"
+                    name="website"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                    style={{ display: 'none' }}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
                   <input
                     type="text"
                     placeholder="Votre nom"
                     required
+                    maxLength={100}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-2 border rounded"
@@ -219,6 +259,7 @@ export default function LandingNavbar() {
                     type="email"
                     placeholder="Votre email"
                     required
+                    maxLength={320}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-2 border rounded"
@@ -227,10 +268,14 @@ export default function LandingNavbar() {
                     placeholder="Votre message"
                     required
                     rows={4}
+                    maxLength={2000}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="w-full px-4 py-2 border rounded"
-                  ></textarea>
+                  />
+                  {sendError && (
+                    <p className="text-red-500 text-sm">{sendError}</p>
+                  )}
                   <button
                     type="submit"
                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"

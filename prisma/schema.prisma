@@ -45,11 +45,19 @@ model User {
   image         String?
   password      String?
   interests     String[]
+  bio           String?
+  location      String?
+  website       String?
+  instagram     String?
+  featured      Boolean   @default(false)
+  featuredOrder Int?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
   artworks      Artwork[]
+
+  @@index([featured])
 }
 
 model VerificationToken {
@@ -75,4 +83,8 @@ model Artwork {
   updatedAt   DateTime @updatedAt
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([category])
+  @@index([createdAt])
 }

@@ -6,14 +6,17 @@ import ArtistCard from '@/components/ui/ArtistCard'
 import { useState, useEffect } from 'react'
 import ArtModal from '@/components/ui/ArtModal'
 import GalleryHeader from '@/components/ui/GalleryHeader'
-import { 
-  getArtworks, 
-  getArtists, 
-  getCategories, 
-  searchArtworks, 
+import {
+  getArtworks,
+  getArtists,
+  getCategories,
+  getUserInterests,
+  getFeaturedArtists,
+  searchArtworks,
   getArtworksByCategory,
-  type Artwork, 
-  type Artist 
+  type Artwork,
+  type Artist,
+  type FeaturedArtist,
 } from '@/app/data/dataservices'
 
 // Configuration responsive pour Masonry
@@ -36,11 +39,14 @@ export default function FeedPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null)
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  
+  const [userClickedAll, setUserClickedAll] = useState(false)
+
   // États pour les données
   const [artworks, setArtworks] = useState<Artwork[]>([])
   const [artists, setArtists] = useState<Artist[]>([])
   const [categories, setCategories] = useState<string[]>([])
+  const [userInterests, setUserInterests] = useState<string[]>([])
+  const [featuredArtists, setFeaturedArtists] = useState<FeaturedArtist[]>([])
   const [filteredArtworks, setFilteredArtworks] = useState<Artwork[]>([])
   const [filteredArtists, setFilteredArtists] = useState<Artist[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,16 +57,26 @@ export default function FeedPage() {
     const loadInitialData = async () => {
       try {
         setLoading(true)
-        const [artworksData, artistsData, categoriesData] = await Promise.all([
+        const [artworksData, artistsData, categoriesData, interestsData, featuredData] = await Promise.all([
           getArtworks(),
           getArtists(),
-          getCategories()
+          getCategories(),
+          getUserInterests(),
+          getFeaturedArtists(),
         ])
-        
+
         setArtworks(artworksData)
         setArtists(artistsData)
         setCategories(categoriesData)
-        setFilteredArtworks(artworksData)
+        setUserInterests(interestsData)
+        setFeaturedArtists(featuredData)
+
+        // Affichage initial : filtrer par intérêts si l'utilisateur en a
+        const initial =
+          interestsData.length > 0
+            ? artworksData.filter((a) => interestsData.includes(a.category))
+            : artworksData
+        setFilteredArtworks(initial)
         setFilteredArtists(artistsData)
       } catch (err) {
         setError('Erreur lors du chargement des données')
@@ -78,23 +94,22 @@ export default function FeedPage() {
     const filterArtworks = async () => {
       try {
         let result: Artwork[] = []
-        
+
         if (searchQuery.trim()) {
-          // Si on a une recherche, utiliser la fonction de recherche
           result = await searchArtworks(searchQuery)
-          
-          // Appliquer le filtre de catégorie si nécessaire
           if (activeCategory) {
-            result = result.filter(art => art.category === activeCategory)
+            result = result.filter((art) => art.category === activeCategory)
           }
         } else if (activeCategory) {
-          // Si on a seulement une catégorie, utiliser le filtre par catégorie
           result = await getArtworksByCategory(activeCategory)
         } else {
-          // Sinon, afficher toutes les œuvres
-          result = artworks
+          // Pas de filtre actif : intérêts seulement si l'utilisateur n'a pas cliqué "Toutes"
+          result =
+            userInterests.length > 0 && !userClickedAll
+              ? artworks.filter((a) => userInterests.includes(a.category))
+              : artworks
         }
-        
+
         setFilteredArtworks(result)
       } catch (err) {
         console.error('Error filtering artworks:', err)
@@ -105,7 +120,7 @@ export default function FeedPage() {
     if (artworks.length > 0) {
       filterArtworks()
     }
-  }, [searchQuery, activeCategory, artworks])
+  }, [searchQuery, activeCategory, artworks, userInterests, userClickedAll])
 
   // Filtrage des artistes
   useEffect(() => {
@@ -173,15 +188,20 @@ export default function FeedPage() {
   }
 
   return (
-    <main className="bg-white min-h-screen">
-      <GalleryHeader 
+    <main className="bg-white min-h-screen lg:pl-16 xl:pl-20 pb-20 lg:pb-0">
+      <GalleryHeader
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
+        setActiveCategory={(cat) => {
+            if (cat === null) setUserClickedAll(true)
+            else setUserClickedAll(false)
+            setActiveCategory(cat)
+          }}
         categories={categories}
+        featuredArtists={featuredArtists}
       />
 
       {/* Contenu conditionnel selon l'onglet actif */}
@@ -192,10 +212,11 @@ export default function FeedPage() {
             {filteredArtworks.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500 text-lg">
-                  {searchQuery.trim() || activeCategory 
+                  {searchQuery.trim() || activeCategory
                     ? `Aucune œuvre trouvée ${searchQuery.trim() ? `pour "${searchQuery}"` : ''}${activeCategory ? ` dans la catégorie "${activeCategory}"` : ''}`
-                    : 'Aucune œuvre disponible'
-                  }
+                    : userInterests.length > 0
+                    ? `Aucune œuvre dans vos catégories d'intérêt (${userInterests.join(', ')})`
+                    : 'Aucune œuvre disponible'}
                 </p>
               </div>
             ) : (
@@ -205,7 +226,7 @@ export default function FeedPage() {
                 columnClassName="pl-3 sm:pl-4 lg:pl-6"
               >
                 {filteredArtworks.map((art) => (
-                  <div key={art.id} className="mb-4 sm:mb-6">
+                  <div key={art.id} className="mb-3 sm:mb-4">
                     <ArtCard
                       image={art.image}
                       title={art.title}

@@ -54,6 +54,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
+const ALLOWED_CATEGORIES = ['Photographie', '3D', '2D', 'Infographie', 'Sculpture', 'Peinture', 'Dessin', 'Art numérique']
+const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
+const CURRENT_YEAR = new Date().getFullYear()
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -67,13 +72,44 @@ export async function POST(request: NextRequest) {
     const description = formData.get('description') as string | null
     const category = formData.get('category') as string
     const toolsRaw = formData.get('tools') as string
-    const year = parseInt(formData.get('year') as string) || new Date().getFullYear()
+    const yearRaw = parseInt(formData.get('year') as string)
 
-    if (!file || !title || !category) {
-      return NextResponse.json({ error: 'Champs obligatoires manquants' }, { status: 400 })
+    // Validation
+    if (!title || typeof title !== 'string' || title.trim().length === 0 || title.length > 200) {
+      return NextResponse.json({ error: 'Titre invalide (1–200 caractères)' }, { status: 400 })
+    }
+    if (!category || !ALLOWED_CATEGORIES.includes(category)) {
+      return NextResponse.json({ error: 'Catégorie invalide' }, { status: 400 })
+    }
+    if (isNaN(yearRaw) || yearRaw < 1900 || yearRaw > CURRENT_YEAR) {
+      return NextResponse.json({ error: `Année invalide (1900–${CURRENT_YEAR})` }, { status: 400 })
+    }
+    if (description && description.length > 2000) {
+      return NextResponse.json({ error: 'Description trop longue (max 2000 caractères)' }, { status: 400 })
+    }
+    if (!file) {
+      return NextResponse.json({ error: 'Image obligatoire' }, { status: 400 })
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: 'Fichier trop volumineux (max 10 Mo)' }, { status: 400 })
+    }
+    if (!ALLOWED_MIME.includes(file.type)) {
+      return NextResponse.json({ error: 'Format non accepté (JPEG, PNG, WebP, GIF uniquement)' }, { status: 400 })
     }
 
-    const tools: string[] = toolsRaw ? JSON.parse(toolsRaw) : []
+    let tools: string[] = []
+    try {
+      tools = toolsRaw ? JSON.parse(toolsRaw) : []
+      if (
+        !Array.isArray(tools) ||
+        tools.length > 20 ||
+        !tools.every((t) => typeof t === 'string' && t.length <= 100)
+      ) throw new Error()
+    } catch {
+      return NextResponse.json({ error: 'Format des outils invalide' }, { status: 400 })
+    }
+
+    const year = yearRaw
 
     const blob = await put(`artworks/${session.user.id}/${Date.now()}-${file.name}`, file, {
       access: 'public',
@@ -94,8 +130,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(artwork, { status: 201 })
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    console.error('POST /api/artworks:', message)
-    return NextResponse.json({ error: message }, { status: 500 })
+    console.error('POST /api/artworks:', error)
+    return NextResponse.json({ error: 'Erreur lors de la publication' }, { status: 500 })
   }
 }

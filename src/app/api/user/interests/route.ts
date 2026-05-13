@@ -3,9 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const db = prisma as any
-
 export async function GET() {
   try {
     const session = await getServerSession(authOptions)
@@ -13,7 +10,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
 
-    const user = await db.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { interests: true },
     })
@@ -34,11 +31,15 @@ export async function PUT(request: NextRequest) {
 
     const { interests } = await request.json()
 
-    if (!Array.isArray(interests)) {
+    if (
+      !Array.isArray(interests) ||
+      interests.length > 20 ||
+      !interests.every((i) => typeof i === 'string' && i.length > 0 && i.length <= 100)
+    ) {
       return NextResponse.json({ error: 'Format invalide' }, { status: 400 })
     }
 
-    await db.user.update({
+    await prisma.user.update({
       where: { id: session.user.id },
       data: { interests },
     })

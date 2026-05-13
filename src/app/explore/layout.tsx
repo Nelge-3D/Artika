@@ -2,8 +2,8 @@ import Navbar from "@/components/ui/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ArTika",
-  description: "Découvrez la richesse culturelle du Gabon et du Congo à travers nos cours de langue en ligne ! ",
+  title: "Explorer — ArTika",
+  description: "Explorez les artistes et les œuvres de la galerie ArTika. Filtrez par catégorie, tendance et bien plus.",
 };
 
 export default function RootLayout({

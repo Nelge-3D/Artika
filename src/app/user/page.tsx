@@ -100,6 +100,8 @@ function ArtworkModal({
             <img
               src={artwork.image}
               alt={artwork.title}
+              loading="lazy"
+              decoding="async"
               className={`w-full h-full object-contain ${isLandscape ? 'md:absolute md:inset-0' : ''}`}
               style={!isLandscape ? { maxHeight: '60vh', objectFit: 'contain' } : undefined}
             />
@@ -174,6 +176,7 @@ export default function UserProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [artworks, setArtworks] = useState<MyArtwork[]>([])
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<MyArtwork | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -184,9 +187,14 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     if (status !== 'authenticated' || !session?.user?.id) return
-    fetch(`/api/artworks?userId=${session.user.id}`)
-      .then((r) => r.json())
-      .then((data) => setArtworks(Array.isArray(data) ? data : []))
+    Promise.all([
+      fetch(`/api/artworks?userId=${session.user.id}`).then((r) => r.json()),
+      fetch('/api/user/profile').then((r) => r.json()),
+    ])
+      .then(([artworksData, profileData]) => {
+        setArtworks(Array.isArray(artworksData) ? artworksData : [])
+        setAvatarUrl(profileData.image ?? null)
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [status, session?.user?.id])
@@ -231,7 +239,7 @@ export default function UserProfilePage() {
           className="bg-gradient-to-r from-purple-600 to-indigo-700 rounded-2xl p-8 mb-8 text-white"
         >
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-            <UserAvatar name={displayName} src={session.user?.image} size={96} className="border-4 border-white/30" />
+            <UserAvatar name={displayName} src={avatarUrl ?? session.user?.image} size={96} className="border-4 border-white/30" />
             <div className="text-center sm:text-left flex-1">
               <h1 className="text-3xl font-bold mb-1">{displayName}</h1>
               <p className="text-white/80 mb-4">{session.user?.email}</p>
@@ -286,6 +294,8 @@ export default function UserProfilePage() {
                 <img
                   src={art.image}
                   alt={art.title}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-auto block group-hover:scale-105 transition-transform duration-300"
                 />
                 {/* Overlay hover */}

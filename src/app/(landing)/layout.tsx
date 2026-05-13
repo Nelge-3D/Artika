@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ArTika",
-  description: "Découvrez la richesse culturelle du Gabon et du Congo à travers nos cours de langue en ligne ! ",
+  title: "ArTika — Galerie d'art numérique gabonaise",
+  description: "ArTika est la première galerie d'art numérique gabonaise. Découvrez, soutenez et connectez-vous avec les artistes locaux.",
 };
 
 export default function RootLayout({

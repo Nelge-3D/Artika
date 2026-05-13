@@ -1,11 +1,10 @@
 // app/artist/[slug]/page.tsx
 
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Metadata } from 'next'
 import Navbar from '@/components/ui/Navbar'
-import { Heart, MessageCircle, Share2, MapPin, Calendar, Eye, Download, Filter, Search, Star, Camera, Palette, User } from 'lucide-react'
+import { Heart, MapPin, Calendar, Eye, Camera, Globe, ArrowLeft } from 'lucide-react'
 import { getArtworks, getArtistBySlug, getArtworksByArtist } from '@/app/data/artistsdataservices'
 import { slugify } from '@/lib/slugify'
 import UserAvatar from '@/components/ui/UserAvatar'
@@ -106,10 +105,6 @@ export default async function ArtistPage({
                       <Calendar className="w-4 h-4" />
                       <span>Membre depuis {finalArtistData.joinDate}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span>{popularity}% popularité</span>
-                    </div>
                   </div>
                   
                   {/* Statistiques */}
@@ -142,132 +137,52 @@ export default async function ArtistPage({
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button className="flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-full font-medium hover:bg-gray-100 transition shadow-lg">
-                  <User className="w-4 h-4" />
-                  Suivre
-                </button>
-                <button className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-full font-medium hover:bg-purple-700 transition shadow-lg">
-                  <MessageCircle className="w-4 h-4" />
-                  Contacter
-                </button>
-                <button className="flex items-center gap-2 px-4 py-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition">
-                  <Share2 className="w-4 h-4" />
-                </button>
-                <button className="flex items-center gap-2 px-4 py-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition">
-                  <Download className="w-4 h-4" />
-                </button>
+              {/* Retour */}
+              <div>
+                <Link
+                  href="/feed"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full text-sm transition"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Galerie
+                </Link>
               </div>
             </div>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Contenu principal */}
+          {/* Grille des œuvres */}
           <div className="lg:col-span-2">
-            {/* Navigation des sections */}
-            <div className="bg-white rounded-xl shadow-sm mb-6 sticky top-4 z-10">
-              <div className="flex items-center gap-6 px-6 py-4 border-b">
-                <button className="text-purple-600 font-medium border-b-2 border-purple-600 pb-2">
-                  Projets ({artistArtworks.length})
-                </button>
-                <button className="text-gray-600 hover:text-gray-900 transition pb-2">
-                  Collections
-                </button>
-                <button className="text-gray-600 hover:text-gray-900 transition pb-2">
-                  Témoignages
-                </button>
-              </div>
-              
-              {/* Filtres et recherche */}
-              <div className="flex flex-wrap items-center gap-4 px-6 py-4">
-                <div className="flex-1 min-w-64">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Rechercher dans les projets..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-gray-400" />
-                  <select className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500">
-                    <option>Toutes catégories</option>
-                    {categories.map(cat => (
-                      <option key={cat}>{cat}</option>
-                    ))}
-                  </select>
-                  <select className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500">
-                    <option>Plus récents</option>
-                    <option>Plus populaires</option>
-                    <option>Plus de vues</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Grille des projets */}
-            <div className="grid gap-6 sm:grid-cols-2">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">
+              Œuvres <span className="text-gray-400 font-normal text-sm">({artistArtworks.length})</span>
+            </h2>
+            <div className="columns-2 sm:columns-2 lg:columns-3 gap-3 space-y-3">
               {artistArtworks.map((art) => (
-                <div
+                <Link
                   key={art.id}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
+                  href={`/art/${art.id}`}
+                  className="break-inside-avoid block group rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-lg transition-shadow"
                 >
-                  <div className="relative w-full h-64">
-                    <Image
-                      src={art.image}
-                      alt={art.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300">
-                      <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-2 bg-white/90 rounded-full hover:bg-white transition">
-                          <Heart className="w-4 h-4 text-gray-700" />
-                        </button>
-                        <button className="p-2 bg-white/90 rounded-full hover:bg-white transition">
-                          <Share2 className="w-4 h-4 text-gray-700" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="absolute top-4 left-4">
-                      <span className="px-2 py-1 bg-white/90 rounded-full text-xs font-medium text-gray-700">
-                        {art.category}
+                  <img
+                    src={art.image}
+                    alt={art.title}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-auto block group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-gray-900 line-clamp-1 group-hover:text-purple-600 transition-colors">
+                      {art.title}
+                    </p>
+                    <div className="flex items-center justify-between mt-1 text-xs text-gray-400">
+                      <span>{art.category}</span>
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-3 h-3" /> {art.likes}
+                        <Eye className="w-3 h-3 ml-2" /> {art.views}
                       </span>
                     </div>
                   </div>
-                  
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
-                      {art.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{art.description}</p>
-                    
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <span>Outils: {art.tools.join(', ')}</span>
-                      <span>{art.year}</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <Heart className="w-4 h-4" />
-                          <span>{art.likes}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" />
-                          <span>{art.views}</span>
-                        </div>
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {art.popularity}% popularité
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -276,94 +191,86 @@ export default async function ArtistPage({
           <div className="space-y-6">
             {/* À propos */}
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">À propos</h3>
-              <p className="text-gray-700 leading-relaxed mb-4">{finalArtistData.bio}</p>
-              
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">{finalArtistData.experience}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">{finalArtistData.education}</span>
-                </div>
-              </div>
+              <h3 className="text-lg font-semibold mb-3 text-gray-900">À propos</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{finalArtistData.bio}</p>
             </div>
 
-            {/* Compétences */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Compétences</h3>
-              <div className="flex flex-wrap gap-2">
-                {finalArtistData.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium"
-                  >
-                    {skill}
-                  </span>
-                ))}
+            {/* Catégories */}
+            {categories.length > 0 && (
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">Catégories</h3>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <span key={cat} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                      {cat}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Liens */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Liens</h3>
-              <div className="space-y-3">
-                {finalArtistData.website && (
-                  <a href={`https://${finalArtistData.website}`} className="flex items-center gap-2 text-purple-600 hover:text-purple-700 transition">
-                    <div className="w-4 h-4 bg-purple-100 rounded"></div>
-                    <span className="text-sm">{finalArtistData.website}</span>
-                  </a>
-                )}
-                {finalArtistData.instagram && (
-                  <a href={`https://instagram.com/${finalArtistData.instagram.replace('@', '')}`} className="flex items-center gap-2 text-pink-600 hover:text-pink-700 transition">
-                    <Camera className="w-4 h-4" />
-                    <span className="text-sm">{finalArtistData.instagram}</span>
-                  </a>
-                )}
-                {finalArtistData.behance && (
-                  <a href={`https://behance.net/${finalArtistData.behance}`} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition">
-                    <Palette className="w-4 h-4" />
-                    <span className="text-sm">Behance</span>
-                  </a>
-                )}
+            {(finalArtistData.website || finalArtistData.instagram) && (
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900">Liens</h3>
+                <div className="space-y-3">
+                  {finalArtistData.website && (
+                    <a
+                      href={finalArtistData.website.startsWith('http') ? finalArtistData.website : `https://${finalArtistData.website}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-purple-600 hover:text-purple-700 transition text-sm"
+                    >
+                      <Globe className="w-4 h-4" />
+                      {finalArtistData.website}
+                    </a>
+                  )}
+                  {finalArtistData.instagram && (
+                    <a
+                      href={`https://instagram.com/${finalArtistData.instagram.replace('@', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-pink-600 hover:text-pink-700 transition text-sm"
+                    >
+                      <Camera className="w-4 h-4" />
+                      @{finalArtistData.instagram.replace('@', '')}
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Artistes recommandés */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Artistes similaires</h3>
-              <div className="space-y-3">
-                {allArtworks.filter(art => art.artist !== artistName).slice(0, 3).map((art) => (
-                  <Link 
-                    key={art.id}
-                    href={`/artist/${slugify(art.artist)}`}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
-                  >
-                    <UserAvatar
-                      name={art.artist}
-                      size={40}
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium text-sm">{art.artist}</div>
-                      <div className="text-xs text-gray-500">{art.tools[0]}</div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
+            {/* Artistes similaires */}
+            {(() => {
+              const seen = new Set<string>()
+              const similar = allArtworks.filter((art) => {
+                if (art.artist === artistName || seen.has(art.artist)) return false
+                seen.add(art.artist)
+                return true
+              }).slice(0, 4)
+              if (similar.length === 0) return null
+              return (
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="text-lg font-semibold mb-3 text-gray-900">Autres artistes</h3>
+                  <div className="space-y-3">
+                    {similar.map((art) => (
+                      <Link
+                        key={art.artist}
+                        href={`/artist/${slugify(art.artist)}`}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
+                      >
+                        <UserAvatar name={art.artist} size={40} />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{art.artist}</p>
+                          <p className="text-xs text-gray-500">{art.category}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
           </div>
-        </div>
-
-        {/* Retour */}
-        <div className="text-center mt-12">
-          <Link 
-            href="/feed" 
-            className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium transition"
-          >
-            ← Retour à la galerie
-          </Link>
         </div>
       </div>
     </main>

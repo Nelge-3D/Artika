@@ -16,8 +16,7 @@ const Navbar = () => {
 
   // Navigation items pour utilisateurs non connectés
   const guestNavItems = [
-    { href: '/feed', icon: <Home size={20} />, label: 'Home' },
-    { href: '/explore', icon: <Compass size={20} />, label: 'Explorer' },
+    { href: '/feed', icon: <Home size={20} />, label: 'Galerie' },
     { href: '/auth/login', icon: <User size={20} />, label: 'Se connecter' },
   ]
 
@@ -26,6 +25,7 @@ const Navbar = () => {
     { href: '/feed', icon: <Home size={20} />, label: 'Feed' },
     { href: '/upload', icon: <Upload size={20} />, label: 'Publier' },
     { href: '/user', icon: <User size={20} />, label: 'Mon profil' },
+    { href: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
   ]
 
   // Choisir les items de navigation selon l'état de connexion
@@ -156,11 +156,11 @@ const Navbar = () => {
                     <p className="text-xs text-gray-500">{session.user?.email}</p>
                   </div>
                   <Link
-                    href="/user"
+                    href="/settings"
                     className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     <Settings size={16} />
-                    <span className="text-sm">Profil</span>
+                    <span className="text-sm">Paramètres</span>
                   </Link>
                   <button
                     onClick={handleSignOut}
@@ -242,11 +242,11 @@ const Navbar = () => {
             </div>
             <div className="px-4 py-2">
               <Link
-                href="/user"
+                href="/settings"
                 className="flex items-center gap-3 py-2 text-gray-700 hover:text-blue-600"
               >
                 <Settings size={16} />
-                <span>Profil</span>
+                <span>Paramètres</span>
               </Link>
               <button
                 onClick={handleSignOut}

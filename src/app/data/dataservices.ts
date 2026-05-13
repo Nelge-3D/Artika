@@ -71,3 +71,31 @@ export const getCategories = async (): Promise<string[]> => {
   const artworks = await fetchArtworks()
   return [...new Set(artworks.map((a) => a.category))]
 }
+
+export interface FeaturedArtist {
+  id: string
+  name: string
+  image?: string | null
+  bio?: string | null
+}
+
+export const getFeaturedArtists = async (): Promise<FeaturedArtist[]> => {
+  try {
+    const res = await fetch('/api/featured-artists', { cache: 'no-store' })
+    if (!res.ok) return []
+    return res.json()
+  } catch {
+    return []
+  }
+}
+
+export const getUserInterests = async (): Promise<string[]> => {
+  try {
+    const res = await fetch('/api/user/interests', { cache: 'no-store' })
+    if (!res.ok) return []
+    const data = await res.json()
+    return Array.isArray(data.interests) ? data.interests : []
+  } catch {
+    return []
+  }
+}

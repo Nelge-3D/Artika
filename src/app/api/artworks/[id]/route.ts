@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { del } from '@vercel/blob'
 
 export async function DELETE(
   _request: NextRequest,
@@ -21,6 +22,12 @@ export async function DELETE(
     }
     if (artwork.userId !== session.user.id) {
       return NextResponse.json({ error: 'Interdit' }, { status: 403 })
+    }
+
+    try {
+      await del(artwork.imageUrl, { token: process.env.BLOB_READ_WRITE_TOKEN })
+    } catch (blobErr) {
+      console.error('Erreur suppression Blob (non bloquant):', blobErr)
     }
 
     await prisma.artwork.delete({ where: { id } })

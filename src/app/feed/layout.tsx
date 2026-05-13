@@ -2,8 +2,8 @@ import Navbar from "@/components/ui/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ArTika",
-  description: "Découvrez la richesse culturelle du Gabon et du Congo à travers nos cours de langue en ligne ! ",
+  title: "ArTika — Galerie",
+  description: "Explorez les œuvres d'artistes numériques gabonais sur ArTika : illustrations, 3D, photographie et bien plus.",
 };
 
 export default function RootLayout({
@@ -12,10 +12,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    
-      <>
-      <Navbar/>
-        <main >{children}</main>
-      </>
+    <>
+      <Navbar />
+      {children}
+    </>
   );
 }

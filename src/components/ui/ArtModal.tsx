@@ -238,6 +238,8 @@ export default function ArtModal({
               <img
                 src={artwork.image}
                 alt={artwork.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-contain md:absolute md:inset-0"
               />
               {/* Stats overlay */}
@@ -257,6 +259,8 @@ export default function ArtModal({
               <img
                 src={artwork.image}
                 alt={artwork.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto block"
                 style={{ maxHeight: '58vh', objectFit: 'contain' }}
               />
